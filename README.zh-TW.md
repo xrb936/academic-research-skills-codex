@@ -1,4 +1,4 @@
-# Academic Research Skills for Claude Code
+# Academic Research Skills for Codex
 
 [![Version](https://img.shields.io/badge/version-v3.7.0-blue)](https://github.com/Imbad0202/academic-research-skills/releases/tag/v3.7.0)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc/4.0/)
@@ -6,16 +6,7 @@
 
 [English](README.md)
 
-一套完整的學術研究 Claude Code 技能包，涵蓋從研究到論文出版的全流程。
-
-**30 秒安裝**（Claude Code CLI / VS Code / JetBrains，v3.7.0+）：
-
-```text
-/plugin marketplace add Imbad0202/academic-research-skills
-/plugin install academic-research-skills
-```
-
-裝完跑 `/ars-plan`，ARS 會用蘇格拉底對話幫你規劃章節結構。需要前置條件或傳統 symlink 安裝請看 [快速安裝](#快速安裝)。
+一套完整的學術研究 Codex 技能包，涵蓋從研究到論文出版的全流程。
 
 > **AI 是你的副駕駛，不是機長。** 這工具不會幫你寫論文。它處理苦工 — 搜文獻、排格式、驗數據、查邏輯一致性 — 讓你專注在真正需要你腦子的事：定義問題、選方法、詮釋數據的意義、寫出「我認為」後面那句話。
 >
@@ -37,30 +28,15 @@ v3.3 的靈感來自 [**PaperOrchestra**](https://arxiv.org/abs/2604.05018)（So
 
 這份架構文件取代了原本散在 README 各處的 pipeline 描述。關於「哪個階段跑什麼」的所有資訊都集中在一個地方。
 
-## 快速安裝
+## 安裝與設定
 
-**前置條件**
-
-- [Claude Code](https://claude.ai/install.sh)（建議最新版；plugin packaging 需要近期版本）
-- 已 export `ANTHROPIC_API_KEY`，或第一次跑 `claude` 時設定
-- *選用：* Pandoc 用於 DOCX 輸出，tectonic + 思源宋體 TC 用於 APA 7.0 PDF（純 Markdown 輸出兩個都不需要）
-
-**Plugin 安裝（v3.7.0+，推薦）：**
-
-```text
-/plugin marketplace add Imbad0202/academic-research-skills
-/plugin install academic-research-skills
-```
-
-**驗證可用：** 跑 `/ars-plan` 並描述你正在寫的論文，ARS 會用蘇格拉底對話幫你規劃章節結構。想要單次測試的話改跑 `/ars-lit-review "你的主題"`。
-
-**👉 [docs/SETUP.zh-TW.md](docs/SETUP.zh-TW.md)** — 完整指南：安裝 Claude Code、設定 API key、選用的 Pandoc/tectonic（DOCX/PDF）、跨模型驗證（`ARS_CROSS_MODEL`），以及五種安裝方式（Plugin、專案 skills、全域 skills、claude.ai Project、repo clone）。
+**👉 [docs/SETUP.zh-TW.md](docs/SETUP.zh-TW.md)** — Codex 完整指南：安裝 Codex、完成登入驗證、選用 Pandoc/tectonic（DOCX/PDF）、設定跨模型驗證（`ARS_CROSS_MODEL`），並選擇 symlink、copy 或直接在 repo 內使用。本 Codex 適配 fork 也保留 `.codex-plugin/plugin.json` metadata，供支援 plugin metadata 的 Codex 環境使用。
 
 **用 Codex CLI？** 請改裝姊妹版：[`Imbad0202/academic-research-skills-codex`](https://github.com/Imbad0202/academic-research-skills-codex)。同一套 workflow 內容，Codex 原生包裝為單一 `$academic-research-suite` skill，提供 `ars-*` 別名。
 
 ## 效能與費用
 
-**👉 [docs/PERFORMANCE.zh-TW.md](docs/PERFORMANCE.zh-TW.md)** — 各模式 token 預算、完整 pipeline 估算（~$4–6 for 一篇 15k 字論文），以及建議的 Claude Code 設定（Skip Permissions；Agent Team 選用）。
+**👉 [docs/PERFORMANCE.zh-TW.md](docs/PERFORMANCE.zh-TW.md)** — 各模式 token 預算、完整 pipeline 估算，以及適合長時間學術工作流的 Codex 設定。
 
 ## 使用指南與文章
 
@@ -296,19 +272,17 @@ https://github.com/Imbad0202/academic-research-skills
 
 ## 更新紀錄
 
-### v3.7.0（2026-05-05）— Claude Code Plugin 打包
+### v3.7.0（2026-05-05）— Codex Plugin Metadata 適配
 
-> Plugin 打包升級：ARS 現可在 Claude Code CLI / VS Code / JetBrains 一行裝（`/plugin marketplace add Imbad0202/academic-research-skills` + `/plugin install academic-research-skills`）。原本的 `git clone + symlink 到 ~/.claude/skills/` 安裝流程不變、繼續支援；雙軌都是一級公民。
+> 上游 v3.7.0 新增 Claude Code plugin 打包。本 fork 保留打包意圖，但把目前入口轉成 Codex：`.codex-plugin/plugin.json` 描述整套 suite；直接 `git clone` 後 symlink 或 copy 到 `~/.codex/skills/` 仍是最可攜流程。
 
-- **Plugin manifest 與 marketplace metadata**（Phase 1，PR #68）：`.claude-plugin/plugin.json` 宣告整個 suite（4 個 skill 透過 `skills/` 目錄相對 symlink 自動探索）；`.claude-plugin/marketplace.json` 註冊 plugin，使單一 GitHub-hosted endpoint 同時提供 marketplace listing 與 plugin 來源。README、`README.zh-TW.md`、`docs/SETUP.md` 都加入雙軌安裝指引。
-- **10 個 slash command** 在 `commands/ars-*.md`（Phase 2.1，PR #69）將 `MODE_REGISTRY.md` 的條目對映到 `/ars-<mode>` 觸發。每個 command frontmatter 釘住模型路由：`opus` 給 `full` 與 `revision-coach`（架構與審稿解讀深度），`sonnet` 給其他 8 個。任何情境不用 Haiku。
-- **3 個 plugin-shipped agent** 在 `agents/*_agent.md`（Phase 2.1，PR #69）以相對 symlink 指向 `deep-research/agents/` 內 v3.6.7 已 hardened 的下游 agent：`synthesis_agent`、`research_architect_agent`、`report_compiler_agent`。底線檔名保留以對齊 `scripts/check_v3_6_7_pattern_protection.py` hard-pin 路徑與 INV-3 manifest-confined Clause 1 不變式。Symlink（不複製）維持 single source of truth，避免 v3.6.7 §6 inversion sweep + INV-1/2/3 lint 已關閉的 Pattern C3 攻擊面再開。
-- **`model: inherit`** 加在這三個 source agent frontmatter 上。選 inherit 而非 pin `sonnet` 是為了讓 Opus session 跑 ARS full pipeline 時 agent 仍是 Opus（不被降）。使用者的 `~/.claude/hooks/warn-agent-no-model.sh` PreToolUse hook 在派工邊界已 gate Haiku，所以 inherit 解析到的是已經沒 Haiku 的模型。
-- **SessionStart announce hook** 在 `hooks/hooks.json` + `scripts/announce-ars-loaded.sh`（Phase 2.2，PR #70）。Plugin 載入時，hook 把 10 個 slash command、3 個 plugin agent、token 預算指引以 `additionalContext` 注入 LLM 第一輪。`startup` 與 `clear` 拿完整 announce；`resume` 與 `compact` 只拿一行確認，避免每次 resume 都燒 context。Bash 3.2 兼容 — macOS stock `/bin/bash` 直接跑，不需 `brew install bash`。
-- **Phase 2.2 範圍縮減**：原本規劃的 `SubagentStop → run_codex_audit.sh` codex audit hook 在 v3.7.0 被排除，因為 (a) contract gap：SubagentStop payload 沒帶 stage / deliverable，wrapper 必要參數無法從 hook 推出；(b) invoker 邊界：`run_codex_audit.sh` lines 4–7 明禁同 session in-LLM 呼叫，PostToolUse 在產出 deliverable 的 LLM session 內觸發。真正的 audit-hook 整合留到後續版本，等 ARS 有 stage / deliverable propagation contract 再做。詳見 `docs/design/2026-04-30-ars-v3.7.0-plugin-packaging-roadmap.md` Update note 2026-05-05（Phase 2.2 scope reduction）。
-- **`docs/PERFORMANCE.md` + `.zh-TW.md`** 新增「v3.7.0 Plugin agent 與模型路由」節，說明 inherit 語意與目前 3-agent scope 邊界。
-- **跨三個 PR 的 codex review chain**：8 輪 inline iterative review + 3 輪 fresh PR-level review，全部在 merge 前收斂到 0 個 P0/P1/P2 finding。Phase 2.2 fresh PR review 抓到一個 P2（`${CLAUDE_PLUGIN_ROOT}` 沒 quote，含空白的安裝路徑會 break）— inline 輪次抓不到，證實「實作 review（inline）」與「contract review（fresh）」分離的價值。
-- **沒動的東西**：4 個 skill 目錄、25 個 mode、agent prompt、schema 檔案、lint contract 全不變。Plugin 打包只**新增**頂層介面（`commands/`、`agents/`、`hooks/`、`.claude-plugin/`、`skills/` symlink dir、3 個 source agent frontmatter 加 `model: inherit`）。既有 4.3k clone 安裝用戶完全不破。
+- **Codex plugin manifest**：`.codex-plugin/plugin.json` 供支援 plugin metadata 的 Codex 環境讀取，並指向既有四個 skill 目錄。本 fork 不恢復 Claude Code 的 `.claude-plugin/` marketplace 檔案。
+- **10 個 command prompt 檔** 位於 `commands/ars-*.md`，將 `MODE_REGISTRY.md` 條目對映到 `/ars-<mode>` 風格觸發。Frontmatter 改用 `model: inherit`，跟隨目前 Codex session，不再釘住上游 Claude package 的 Opus / Sonnet 名稱。
+- **3 個 plugin-adjacent agent pointer** 位於 `agents/*_agent.md`，仍以相對 symlink 指向 `deep-research/agents/` 內 v3.6.7 已 hardened 的下游 agent：`synthesis_agent`、`research_architect_agent`、`report_compiler_agent`。Symlink 維持 single source of truth，並保留既有 pattern-protection lint 路徑。
+- **Claude SessionStart hook 省略**：上游 `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` 依賴 `${CLAUDE_PLUGIN_ROOT}` 與 Claude Code hook 語義，因此不接入 Codex plugin metadata。
+- **Phase 2.2 範圍縮減** 仍保留：`SubagentStop → run_codex_audit.sh` codex audit hook 因 payload 缺 stage / deliverable 資訊，且同 session 呼叫會違反 wrapper 邊界，故未在 v3.7.0 接入。
+- **`docs/PERFORMANCE.md` + `.zh-TW.md`** 改以 Codex 語境說明 model inherit。
+- **沒動的東西**：4 個 skill 目錄、25 個 mode、agent prompt、schema 檔案、lint contract。
 
 ### v3.6.8（2026-05-03）— Generator-Evaluator Contract Gate（v3.6.6 spec ship）
 
@@ -354,7 +328,7 @@ https://github.com/Imbad0202/academic-research-skills
 
 ### v3.6.3（2026-04-23）— 選用式 Passport 重置邊界
 
-- **Opt-in passport 重置邊界**（`ARS_PASSPORT_RESET=1`）。把每個 FULL checkpoint 提升為 context 重置邊界。新增 `resume_from_passport=<hash>` 模式，讓使用者在新的 Claude Code session 單憑 Material Passport ledger 就恢復 pipeline，不重播先前對話。`systematic-review` 模式 flag ON 時，每個 FULL checkpoint 一律強制重置；其他模式視重置為 flag 開啟後的強預設。Flag OFF 時 byte-for-byte 維持 pre-v3.6.3 行為。
+- **Opt-in passport 重置邊界**（`ARS_PASSPORT_RESET=1`）。把每個 FULL checkpoint 提升為 context 重置邊界。新增 `resume_from_passport=<hash>` 模式，讓使用者在新的 Codex session 單憑 Material Passport ledger 就恢復 pipeline，不重播先前對話。`systematic-review` 模式 flag ON 時，每個 FULL checkpoint 一律強制重置；其他模式視重置為 flag 開啟後的強預設。Flag OFF 時 byte-for-byte 維持 pre-v3.6.3 行為。
 - Schema 9 新增 append-only `reset_boundary[]` ledger，兩種 entry kind（`kind: boundary` + `kind: resume`）。Hash 用 JSON Canonical Form + SHA-256，搭配 canonical placeholder 處理自我參照問題。選填 `pending_decision` 負責 MANDATORY 分支決策。
 - 新 CI lint `scripts/check_passport_reset_contract.py`：任何提到 flag 的檔案都必須指向權威協議文件。
 - 協議文件：`academic-pipeline/references/passport_as_reset_boundary.md`。

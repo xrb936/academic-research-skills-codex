@@ -1,6 +1,7 @@
 """Tests for scripts/adapters/folder_scan.py."""
 from pathlib import Path
 import subprocess
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 ADAPTER = REPO_ROOT / "scripts/adapters/folder_scan.py"
@@ -196,7 +197,10 @@ def test_symlink_pointing_outside_input_does_not_crash(tmp_path):
     (outside / "Smith2024_real.pdf").touch()
     inside = tmp_path / "inside"
     inside.mkdir()
-    os.symlink(outside / "Smith2024_real.pdf", inside / "Smith2024_link.pdf")
+    try:
+        os.symlink(outside / "Smith2024_real.pdf", inside / "Smith2024_link.pdf")
+    except OSError as exc:
+        pytest.skip(f"symlink creation is unavailable in this environment: {exc}")
     p_out = tmp_path / "p.yaml"
     r_out = tmp_path / "r.yaml"
     r = _run("--input", str(inside), "--passport", str(p_out), "--rejection-log", str(r_out))

@@ -1,6 +1,6 @@
 # ARS 效能說明
 
-> **建議模型：Claude Opus 4.7**，搭配 **Max plan**（或同等配置）。Opus 4.7 採用 adaptive thinking，不需要手動指定 thinking budget。
+> **建議配置：完整學術 pipeline 請使用高推理能力的 Codex 模型/profile**。此 workflow 很長，且高度依賴引用、驗證與審查判斷；請依任務風險選擇 Codex 模型與 reasoning effort。
 >
 > 完整學術 pipeline（10 階段）會消耗**大量 token** — 單次完整執行可能超過 200K 輸入 + 100K 輸出 token，視論文長度和修訂輪數而定。請依預算斟酌使用。
 >
@@ -8,7 +8,7 @@
 
 ## 各模式 Token 消耗估算
 
-| Skill / 模式 | 輸入 Token | 輸出 Token | 估算費用（Opus 4.7）|
+| Skill / 模式 | 輸入 Token | 輸出 Token | 估算費用 |
 |---|---|---|---|
 | `deep-research` socratic | ~30K | ~15K | ~$0.60 |
 | `deep-research` full | ~60K | ~30K | ~$1.20 |
@@ -20,34 +20,34 @@
 | **完整 pipeline（10 階段）** | **~200K+** | **~100K+** | **~$4-6** |
 | + 跨模型驗證 | +~10K（外部）| +~5K（外部）| +~$0.60-1.10 |
 
-*以 ~15,000 字論文、~60 篇引用為基準估算。實際消耗隨論文長度、修訂輪數、對話深度而異。費用以 Anthropic API 2026 年 4 月定價計算。*
+*以 ~15,000 字論文、~60 篇引用為基準估算。實際消耗隨論文長度、修訂輪數、對話深度、所選 Codex 模型與 provider pricing 而異。*
 
-## 建議 Claude Code 設定
+## 建議 Codex 設定
 
 | 設定 | 功能說明 | 啟用方式 | 官方文件 |
 |---|---|---|---|
-| **Agent Team**（選用） | 啟用 `TeamCreate` / `SendMessage` tools 做手動多 agent 協作。**ARS 內部平行化不需要這個 flag** — skills 透過內建 `Agent` tool 直接 spawn subagent。僅在你想手動跨 session 協作持久 team 時有用。 | 設定 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`（研究預覽） | 實驗性功能 — 尚無穩定文件 |
-| **Skip Permissions** | 跳過每次工具使用的確認提示，實現全 pipeline 不中斷的自主執行 | 啟動時加上 `claude --dangerously-skip-permissions` | [Permissions](https://docs.anthropic.com/en/docs/claude-code/cli-reference) · [Advanced Usage](https://docs.anthropic.com/en/docs/claude-code/advanced) |
+| **Full Auto** | 降低長時間 workflow 的操作摩擦，同時保留 Codex sandboxing | 啟動時加上 `codex --full-auto` | `codex --help` |
+| **Dangerous Bypass** | 同時跳過 approvals 與 sandboxing | 啟動時加上 `codex --dangerously-bypass-approvals-and-sandbox` | `codex --help` |
 
-> **⚠️ Skip Permissions 注意事項**：此旗標會停用所有工具使用的確認對話框。請自行斟酌使用 — 在可信任的長時間 pipeline 中非常方便，但會移除手動審核的安全機制。僅在你確定接受 Claude 自動執行檔案讀寫、shell 指令等操作時才啟用。
+> **注意**：`--dangerously-bypass-approvals-and-sandbox` 會移除 Codex 一般的 approval 與 sandbox 保護。只應在外部已隔離、你能承擔風險的環境中使用。
 
-### v3.7.0 Plugin agent 與模型路由
+### v3.7.0 Plugin metadata 與模型繼承
 
-當 ARS 以 Claude Code plugin 方式安裝（`/plugin install academic-research-skills`）時，會把三個下游 worker agent 暴露為 plugin-shipped subagent：`synthesis_agent`、`research_architect_agent`、`report_compiler_agent`。三個 agent frontmatter 都標 `model: inherit`，意思是它們**繼承派工 session 的模型**而非寫死特定 floor：
+Codex 適配版帶有 `.codex-plugin/plugin.json` 與三個 plugin-adjacent agent pointer：`synthesis_agent`、`research_architect_agent`、`report_compiler_agent`。三個 source agent frontmatter 都標 `model: inherit`，意思是它們**跟隨目前 Codex session/model 設定**，而非寫死特定 provider 的模型 floor：
 
-- Opus session 跑完整 pipeline 時 agent 是 Opus，保留這三個 agent 設計的整合深度。
-- Sonnet session 取得 Sonnet agent，跟主 session cost / latency 對齊。
-- Agent 永遠不會默默掉到 Haiku — `inherit` 走的是主 session 模型，主 session 本身又被「ARS 全程不用 Haiku」政策守住。
+- 高推理 Codex session 會讓這些 agent call 保持相同推理配置。
+- 低成本 Codex session 則讓 command 與 agent surface 跟目前 session 對齊。
+- 本 fork 不在 command frontmatter 釘住 Claude-specific 的 Opus / Sonnet / Haiku 名稱。
 
-意涵：**plugin agent 的 token 成本完全跟著上表各模式估算走，沒有額外加減**。dispatched agent 跟主 session 同一個模型，主 session 已經付的成本沒有再多一層 plugin agent 收費。如果 pipeline 中途換模型（例如 revision pass 改用 Sonnet 省成本），下一輪 agent 派工自動跟上。
+意涵：**plugin-adjacent agent 的 token 成本仍跟著上表各模式估算走**。如果 pipeline 中途更換 Codex session 模型或 reasoning profile，後續 inherit call 會跟著目前設定走。
 
 其他 ARS agent（`bibliography_agent`、`literature_strategist_agent` 等）在 v3.7.0 不暴露為 plugin agent；它們仍是 in-skill prompt template，由主 session 內聯執行，沒有獨立的模型路由層。更廣的 plugin agent 覆蓋留到後續版本。
 
 ## 長時間 session 管理
 
-完整 pipeline 設計為 human-in-the-loop，每個階段都需使用者確認。實務上一次完整執行會跨越數小時到數天，遠長於 Anthropic 的 prompt cache TTL（5 分鐘）。兩項結果：
+完整 pipeline 設計為 human-in-the-loop，每個階段都需使用者確認。實務上一次完整執行會跨越數小時到數天。兩項結果：
 
-1. **階段間 cache miss 是常態。** 當 stage checkpoint 停留超過 5 分鐘，下一階段會以未快取狀態讀取 context。這是 human-paced pipeline 不可避免的成本。
+1. **Context 與 cache 效率會隨 provider/session 而變。** 長時間停頓與過大的累積 context 可能讓延續成本提高或可靠性下降。
 2. **跨 session 續跑依賴 Material Passport。** ARS 本身不跨 session 保留 orchestrator 狀態。要在新 session 續跑，把 Material Passport YAML 貼回即可；orchestrator 讀取 `compliance_history[]` 與階段完成標記定位中斷點。
 
 ### v3.6.2 Sprint Contract 審稿成本（`full` / `methodology-focus` 模式必跑）
@@ -80,14 +80,14 @@ Schema 13 sprint contract 把每個 reviewer agent 切成 Phase 1（不見論文
 
 1. Session A 跑完一個 stage 到 FULL checkpoint。
 2. 從 checkpoint 通知抄下 `[PASSPORT-RESET: hash=<hash>, stage=<completed>, next=<next>]` tag。
-3. 開新的 Claude Code session（session B），貼入 `resume_from_passport=<hash>`。支援可選覆蓋：`resume_from_passport=<hash> stage=<n> mode=<m>`。
+3. 開新的 Codex session（session B），貼入 `resume_from_passport=<hash>`。支援可選覆蓋：`resume_from_passport=<hash> stage=<n> mode=<m>`。
 4. Session B 只讀 passport ledger，不重播 session A 的對話。Orchestrator 找到相符的 `kind: boundary` entry，append 一個 `kind: resume` entry 完成消費，然後繼續。繼續的 stage 由以下順序決定：使用者在 resume 指令附上 `stage=` 時以其為準，否則當 boundary 帶 `pending_decision` 時由 orchestrator 先重新詢問使用者再用對應選項的 `next_stage`，否則才採用記錄的 `next` 欄位。所有選項都終止時，`next` 可以是 `null`。
 
 **何時重置比延續划算：**
 
 - 長 pipeline，session A 累積 >100K input token，下個 stage 不需要這些上下文。
 - `systematic-review` 模式，stage 獨立性由 Material Passport 精確界定。
-- 撞到 5 分鐘 prompt cache TTL：重置讓下個 stage 重新起算，不用在臃腫 context 上付 cache miss。
+- 當長時間停頓或累積 context 讓延續變得不划算時：重置讓下個 stage 從 Material Passport 重新起算。
 
 **何時延續仍然比較好：**
 
@@ -105,7 +105,7 @@ Resume 指令只定義 hash 與可選的 stage/mode 覆蓋：
 resume_from_passport=<hash> [stage=<n>] [mode=<m>]
 ```
 
-Resume 指令本身沒有路徑語法。客製 passport 位置在專案的 `CLAUDE.md` 設定，或由整合方的工具在呼叫 orchestrator 前處理。
+Resume 指令本身沒有路徑語法。客製 passport 位置在專案的 `AGENTS.md` 設定，或由整合方的工具在呼叫 orchestrator 前處理。
 
 **實測 token 節省：** 尚待真實 `systematic-review` 搭配儀器化測量。取得實測資料後會回填本節。目前不做任何數值宣稱。完整協議見 [`../academic-pipeline/references/passport_as_reset_boundary.md`](../academic-pipeline/references/passport_as_reset_boundary.md)。
 

@@ -93,25 +93,22 @@ Meta-lesson from this analysis: "we already do something adjacent" is weaker tha
 
 ## [3.7.0] - 2026-05-05
 
-> **Claude Code plugin packaging.** ARS now installs in one line on Claude Code
-> CLI / VS Code / JetBrains via `/plugin marketplace add Imbad0202/academic-research-skills`
-> + `/plugin install academic-research-skills`. The traditional
-> `git clone + symlink to ~/.claude/skills/` flow continues to work — both
-> tracks are first-class.
+> **Codex plugin metadata adaptation.** Upstream v3.7.0 added Claude Code
+> plugin packaging. This fork keeps the packaging intent but uses
+> `.codex-plugin/plugin.json` for plugin-aware Codex environments, while the
+> direct `git clone` + symlink/copy flow under `~/.codex/skills/` remains the
+> most portable install path.
 
 ### Added
 
-- **Plugin manifest + marketplace metadata** (Phase 1, PR #68).
-  `.claude-plugin/plugin.json` declares the suite. `.claude-plugin/marketplace.json`
-  registers the plugin so a single GitHub-hosted endpoint serves both the
-  marketplace listing and the plugin source. `skills/` directory carries
-  relative symlinks to the four existing skill directories so the plugin
-  loader auto-discovers them without moving repo layout.
+- **Codex plugin manifest** (adapted from upstream Phase 1, PR #68).
+  `.codex-plugin/plugin.json` declares the suite for plugin-aware Codex
+  environments and points at the existing four skill directories without
+  restoring the Claude Code `.claude-plugin/` entrypoint.
 - **10 slash commands** at `commands/ars-*.md` (Phase 2.1, PR #69) mapping
-  `MODE_REGISTRY.md` entries to `/ars-<mode>` triggers. Model routing pinned
-  in each command's frontmatter — `opus` for `full` and `revision-coach`
-  (architectural / review-interpretation depth), `sonnet` for the other 8.
-  No Haiku per `feedback_no_haiku.md`.
+  `MODE_REGISTRY.md` entries to `/ars-<mode>` style triggers. The
+  Codex-adapted command frontmatter uses `model: inherit` so commands follow
+  the current Codex session rather than pinning Claude-specific model names.
 - **3 plugin-shipped agents** at `agents/*_agent.md` (Phase 2.1, PR #69)
   as relative symlinks to the v3.6.7-hardened downstream agents in
   `deep-research/agents/`: `synthesis_agent`, `research_architect_agent`,
@@ -120,20 +117,13 @@ Meta-lesson from this analysis: "we already do something adjacent" is weaker tha
   INV-3 manifest-confined Clause 1 invariant. Symlinks (not copies) preserve
   a single source of truth and prevent the Pattern C3 attack surface that
   v3.6.7 §6 inversion sweep + INV-1/2/3 lint closes.
-- **`model: inherit`** added to those three source agent frontmatters
-  (PR #69 R1 codex finding). Inherit chosen over pinning `sonnet` so an
-  Opus session running the full pipeline keeps Opus agents (instead of
-  being capped) while the user's existing PreToolUse `warn-agent-no-model.sh`
-  hook gates Haiku at the dispatch boundary.
-- **SessionStart announce hook** at `hooks/hooks.json` +
-  `scripts/announce-ars-loaded.sh` (Phase 2.2, PR #70). When the plugin
-  loads, the hook injects `additionalContext` listing the 10 slash commands,
-  the 3 plugin agents, and a token-budget pointer into the LLM's first
-  turn. `startup` and `clear` source values get the full announce; `resume`
-  and `compact` get a one-line ack to avoid burning context on every
-  resume. Bash 3.2 compatible — runs on macOS stock `/bin/bash` with no
-  `brew install bash` requirement. `${CLAUDE_PLUGIN_ROOT}` quoted for
-  install paths containing spaces.
+- **`model: inherit`** retained on the three source agent frontmatters
+  (PR #69 R1 codex finding). In the Codex fork, inherit means these agent
+  pointers follow the current Codex session/model configuration.
+- **Claude SessionStart announce hook omitted**. The upstream
+  `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` path depends on
+  `${CLAUDE_PLUGIN_ROOT}` and Claude Code hook semantics, so it is not wired
+  into the Codex plugin metadata.
 - **`docs/PERFORMANCE.md` + `.zh-TW.md`** subsection
   "v3.7.0 Plugin agents and model routing" explaining `model: inherit`
   semantics and the current 3-agent scope boundary.
@@ -161,8 +151,8 @@ Meta-lesson from this analysis: "we already do something adjacent" is weaker tha
 - `academic-pipeline/SKILL.md` frontmatter `version: "3.7.0"` + H1 +
   Version Info table.
 - `MODE_REGISTRY.md` Last updated bumped to `v3.7.0 (2026-05-05)`.
-- `.claude/CLAUDE.md` Skills Overview row + Suite version footer bumped
-  to 3.7.0.
+- `AGENTS.md` Skills Overview row + Suite version footer bumped to 3.7.0 in
+  the Codex-adapted distribution.
 - `scripts/check_spec_consistency.py` lint pins (Suite version, README
   badge, MODE_REGISTRY heading, CHANGELOG section heading) bumped to
   v3.7.0.
@@ -170,19 +160,18 @@ Meta-lesson from this analysis: "we already do something adjacent" is weaker tha
 ### Unchanged
 
 The four skill directories, all 25 modes, agent prompts, schema files,
-and lint contracts. Plugin packaging only adds new top-level surface
-(`commands/`, `agents/`, `hooks/`, `.claude-plugin/`, `skills/` symlink
-dir, three plugin-agent `model: inherit` frontmatter additions).
-Existing 4.3k clone-install users see no breaking change.
+and lint contracts. Plugin packaging only adds or adapts entrypoint surface
+(`.codex-plugin/`, `commands/`, `agents/`, `skills/` symlink dir, and three
+plugin-agent `model: inherit` frontmatter additions). Existing skill-folder
+install users see no breaking change.
 
 ### Codex review chain
 
 8 inline iterative rounds + 3 fresh PR-level rounds across the three
 PRs (#68 / #69 / #70), all converging to 0 P0/P1/P2 findings before
-merge. The Phase 2.2 fresh PR review caught one P2 (unquoted
-`${CLAUDE_PLUGIN_ROOT}` breaking install paths with spaces) that the
-inline rounds missed — confirms the value of separating implementation
-review (inline) from contract / install-time review (fresh).
+merge. The upstream Phase 2.2 fresh PR review caught one P2 in the Claude
+hook path. The Codex fork omits that hook path and keeps the finding as
+upstream implementation history.
 Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 
 ## [3.6.8] - 2026-05-03
@@ -296,7 +285,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 - **Suite version**: v3.6.7 → v3.6.8 (per the naming note above; design doc
   retains v3.6.6 for the contract gate version).
 - **`academic-pipeline` skill version** bumped from v3.6.7 to v3.6.8 in the
-  `.claude/CLAUDE.md` Skills Overview table.
+  `AGENTS.md` Skills Overview table for the Codex-adapted distribution.
 
 ### Deferred
 

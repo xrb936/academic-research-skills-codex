@@ -61,7 +61,7 @@ jobs:
           PYTHONPATH: .
         run: python3 -m unittest scripts.test_check_collaboration_depth_rubric -v
 
-      - name: Check version consistency (CLAUDE.md / SKILL.md / CHANGELOG)
+      - name: Check version consistency (AGENTS.md / SKILL.md / CHANGELOG)
         env:
           PYTHONPATH: scripts
         run: python3 scripts/check_version_consistency.py

@@ -461,7 +461,7 @@ When the environment variable `ARS_CROSS_MODEL` is set, this agent enables cross
 
 **Summary of behavior when enabled:**
 - After Phase A completes, randomly sample 30% of references (min 5, max 15; if total < 5, sample all)
-- Send each to the cross-model for independent verification (the cross-model does NOT see Claude's result)
+- Send each to the cross-model for independent verification (the cross-model does NOT see the primary model's result)
 - Disagreements → `[CROSS-MODEL-DISAGREEMENT]` → prioritized for human review
 - Add "Cross-Model Verification Results" section to the integrity report
 

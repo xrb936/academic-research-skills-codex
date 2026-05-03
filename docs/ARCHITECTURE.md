@@ -310,11 +310,11 @@ timeline
            : Schema 13.1 + writer_full / evaluator_full templates
            : two-phase orchestration in academic-paper full mode (Phase 4a/4b + 6a/6b)
            : SC-* mode-gating in check_sprint_contract.py
-    v3.7.0 : Claude Code plugin packaging
-           : .claude-plugin/{plugin,marketplace}.json + skills/ symlinks
-           : 10 slash commands (commands/ars-*.md, model pinned opus/sonnet, no haiku)
-           : 3 plugin agents (agents/, symlink to v3.6.7-hardened source, model: inherit)
-           : SessionStart announce hook (hooks/hooks.json + announce-ars-loaded.sh)
+    v3.7.0 : Codex plugin metadata adaptation of upstream plugin packaging
+           : .codex-plugin/plugin.json + existing skill directories
+           : 10 command prompt files (commands/ars-*.md, model: inherit)
+           : 3 plugin-adjacent agent pointers (agents/, symlink to v3.6.7-hardened source, model: inherit)
+           : Claude SessionStart hook omitted because it depends on Claude Code hook semantics
 ```
 
 ## 9. Skill Modes

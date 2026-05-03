@@ -57,7 +57,7 @@ Each venue in the policy database specifies (a) which categories are mandatory t
 Generate a single disclosure paragraph using:
 - The venue's preferred voice (first person vs passive, past tense vs present)
 - The venue's required phrasing elements (many venues require the phrase "The authors take full responsibility for the content" or equivalent)
-- The specific tool name — "Claude (Anthropic) via Academic Research Skills pipeline" — not generic "AI tools"
+- The specific tool name — "Codex (OpenAI) via Academic Research Skills pipeline" by default, or the actual configured model/provider if the run used a different primary model — not generic "AI tools"
 - The specific categories marked USED
 
 Example output for Nature (which requires disclosure in Methods):
@@ -65,7 +65,7 @@ Example output for Nature (which requires disclosure in Methods):
 ```
 ## AI-assisted tools
 
-The authors used Claude [MODEL_VERSION] (Anthropic), orchestrated via the
+The authors used Codex [MODEL_VERSION] (OpenAI), orchestrated via the
 Academic Research Skills pipeline (Wu, 2026), during the preparation
 of this manuscript. Specifically, the tool was used for literature
 search assistance, citation verification, drafting of section outlines,
@@ -74,7 +74,7 @@ AI-assisted output was reviewed, edited, and verified by the authors,
 who take full responsibility for the content of this article.
 ```
 
-**Note**: Replace `[MODEL_VERSION]` with the actual model used in this run (e.g., `Opus 4.7`, `Sonnet 4.6`). Pull the identifier from session metadata rather than hard-coding a version, since Anthropic's lineup changes over time.
+**Note**: Replace `[MODEL_VERSION]` with the actual model used in this run. Pull the identifier from session metadata rather than hard-coding a version, since model lineups change over time.
 
 ### Phase 5: Placement instructions
 

@@ -1,0 +1,44 @@
+{
+  "name": "academic-research-skills-codex",
+  "version": "3.7.0",
+  "description": "Production-grade academic research pipeline for Codex: research to write to review to revise to finalize. Ships 4 skills covering 35+ modes, a 32-agent ensemble, Material Passport handoff schema, v3.6.7 cross-model audit gate, and v3.6.8 generator-evaluator contract for paper drafting.",
+  "author": {
+    "name": "Cheng-I Wu",
+    "url": "https://github.com/Imbad0202"
+  },
+  "homepage": "https://github.com/xrb936/academic-research-skills-codex",
+  "repository": "https://github.com/xrb936/academic-research-skills-codex",
+  "license": "CC-BY-NC-4.0",
+  "keywords": [
+    "academic",
+    "research",
+    "writing",
+    "review",
+    "codex",
+    "deep-research",
+    "literature-review",
+    "systematic-review",
+    "peer-review",
+    "scholarly-publishing"
+  ],
+  "skills": "./",
+  "interface": {
+    "displayName": "Academic Research Skills",
+    "shortDescription": "Academic research, writing, review, and pipeline orchestration for Codex",
+    "longDescription": "Academic Research Skills provides four Codex skills for literature research, paper drafting, peer review, revision support, and end-to-end academic pipeline orchestration with integrity checks and reproducible handoff records.",
+    "developerName": "Cheng-I Wu",
+    "category": "Education",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/xrb936/academic-research-skills-codex",
+    "defaultPrompt": [
+      "Guide my research question into a paper plan",
+      "Review this manuscript for methodological risk",
+      "Run the full academic pipeline from research to final draft"
+    ],
+    "brandColor": "#1F5F5B",
+    "screenshots": []
+  }
+}

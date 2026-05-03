@@ -2,7 +2,7 @@
 
 **Status**: v3.3
 **Used by**: `visualization_agent`
-**Requires**: Multimodal LLM with vision capability (e.g., Claude with vision, GPT-4V)
+**Requires**: Multimodal LLM with vision capability available to Codex or through an external verifier
 
 ---
 

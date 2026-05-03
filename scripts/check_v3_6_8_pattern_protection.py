@@ -236,8 +236,10 @@ def _v3_6_7_manifest_unchanged_in_pr() -> tuple[bool, str | None]:
     # If `git log` somehow under-reports touches (e.g. a corrupted history
     # or a bug in the path filter), the byte comparison still catches the
     # final-state mismatch. This is the round-2 guard, kept as backstop.
-    head_path = REPO_ROOT / rel
-    head_bytes = head_path.read_bytes() if head_path.exists() else None
+    # Clean Windows checkouts can carry CRLF worktree bytes while the committed
+    # blob is LF. Prefer the HEAD blob when the path is clean, but keep
+    # worktree-byte detection for mutation tests and local edits.
+    head_bytes, head_err = _read_head_candidate_bytes(rel)
     base_bytes, err = _read_blob_at_commit(mb, rel)
     if err is not None:
         return False, (
@@ -251,7 +253,8 @@ def _v3_6_7_manifest_unchanged_in_pr() -> tuple[bool, str | None]:
         return False, (
             "[ARS-V3.7.1 LINT ERROR: anti-self-baseline guard tripped: "
             "v3.6.7 manifest is missing at PR HEAD but present at PR base. "
-            "Deletion is not a v3.7.1-work-PR action]"
+            "Deletion is not a v3.7.1-work-PR action"
+            f" ({head_err})]"
         )
     if head_bytes != base_bytes:
         return False, (
@@ -376,6 +379,31 @@ def _read_blob_at_commit(commit: str, repo_relpath: str) -> tuple[bytes | None, 
             f"failed: {stderr!r}]"
         )
     return result.stdout, None
+
+
+def _read_head_candidate_bytes(repo_relpath: str) -> tuple[bytes | None, str | None]:
+    """Read HEAD-equivalent bytes, preserving local mutation detection.
+
+    Clean paths use `git show HEAD:<path>` so Windows checkout line-ending
+    conversion does not trip byte-equivalence checks. Dirty paths use the
+    worktree bytes so tests that mutate fixtures, and local uncommitted
+    edits, still fail the gate.
+    """
+    rc, _, stderr = _run_git(["diff", "--quiet", "--", repo_relpath])
+    if rc == 0:
+        return _read_blob_at_commit("HEAD", repo_relpath)
+    if rc == 1:
+        path = REPO_ROOT / repo_relpath
+        if not path.exists():
+            return None, f"[ARS-V3.7.1 LINT ERROR: {repo_relpath} missing at PR HEAD]"
+        data = path.read_bytes()
+        if os.name == "nt":
+            data = data.replace(b"\r\n", b"\n")
+        return data, None
+    return None, (
+        "[ARS-V3.7.1 LINT ERROR: cannot determine worktree state for "
+        f"{repo_relpath}: git diff rc={rc} stderr={stderr!r}]"
+    )
 
 
 def _sha256(b: bytes) -> str:
@@ -878,14 +906,10 @@ def check_byte_equivalence(verbose: bool = True) -> int:
     # commit, hash both, assert equality.
     failures: list[str] = []
     for rel in files_v367:
-        head_path = REPO_ROOT / rel
-        if not head_path.exists():
-            failures.append(
-                f"  [{rel}] missing at PR HEAD (deletion of v3.6.7-protected "
-                "file would re-open v3.6.7 convergence; restore the file)"
-            )
+        head_bytes_full, err = _read_head_candidate_bytes(rel)
+        if err is not None:
+            failures.append(f"  [{rel}] {err}")
             continue
-        head_bytes_full = head_path.read_bytes()
         head_block = _extract_block_bytes(head_bytes_full)
         if head_block is None:
             failures.append(

@@ -71,8 +71,8 @@ def check_mode_registry() -> None:
             fail(f"{rel_path}: missing mode heading {heading!r}")
 
 
-def check_claude_md() -> None:
-    rel_path = ".claude/CLAUDE.md"
+def check_agents_md() -> None:
+    rel_path = "AGENTS.md"
     expect_contains(rel_path, "integrity check (Stage 2.5)")
     expect_contains(rel_path, "final integrity check (Stage 4.5)")
     expect_contains(rel_path, "**Suite version**: 3.7.0")
@@ -343,7 +343,7 @@ def check_reference_docs() -> None:
 
 def main() -> int:
     check_mode_registry()
-    check_claude_md()
+    check_agents_md()
     check_reviewer_version_block()
     check_pipeline_docs()
     check_readme_sections()

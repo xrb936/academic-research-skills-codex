@@ -5,32 +5,31 @@ Get from zero to your first AI-assisted research in 3 steps.
 ## Step 1: Install
 
 ```bash
-# Install Claude Code
-curl -fsSL https://claude.ai/install.sh | bash
+# Install Codex CLI, then authenticate
+codex login
 
 # Clone this repo somewhere stable
 git clone https://github.com/Imbad0202/academic-research-skills.git ~/academic-research-skills
 
-# Install each of the four skills into your project's .claude/skills/
-cd /path/to/your/project
-mkdir -p .claude/skills
-ln -s ~/academic-research-skills/deep-research .claude/skills/deep-research
-ln -s ~/academic-research-skills/academic-paper .claude/skills/academic-paper
-ln -s ~/academic-research-skills/academic-paper-reviewer .claude/skills/academic-paper-reviewer
-ln -s ~/academic-research-skills/academic-pipeline .claude/skills/academic-pipeline
+# Install each of the four skills into Codex's skills directory
+mkdir -p ~/.codex/skills
+ln -s ~/academic-research-skills/deep-research ~/.codex/skills/deep-research
+ln -s ~/academic-research-skills/academic-paper ~/.codex/skills/academic-paper
+ln -s ~/academic-research-skills/academic-paper-reviewer ~/.codex/skills/academic-paper-reviewer
+ln -s ~/academic-research-skills/academic-pipeline ~/.codex/skills/academic-pipeline
 ```
 
-Each skill must sit at `.claude/skills/<skill-name>/SKILL.md` for Claude Code to discover it. See [docs/SETUP.md](docs/SETUP.md) for the copy-based alternative (Option B) and other installation methods (global `~/.claude/skills/`, Cowork, claude.ai).
+Each skill must sit at `~/.codex/skills/<skill-name>/SKILL.md` for global discovery. See [docs/SETUP.md](docs/SETUP.md) for the copy-based alternative and standalone use.
 
 ## Step 2: Launch
 
 ```bash
-claude
+codex
 ```
 
 ## Step 3: Start researching
 
-Tell Claude what you want to do. It will automatically pick the right skill and mode.
+Tell Codex what you want to do. It will automatically pick the right skill and mode.
 
 ### Example: Guided research (Socratic mode)
 
@@ -39,7 +38,7 @@ You: "I have a vague idea about AI's impact on higher education quality assuranc
       but I'm not sure how to frame the research question. Can you guide me?"
 ```
 
-Claude will enter Socratic mode — asking questions to help you clarify your thinking, not giving you answers directly. After 5-15 rounds of dialogue, you'll have a focused research question and methodology direction.
+Codex will enter Socratic mode — asking questions to help you clarify your thinking, not giving you answers directly. After 5-15 rounds of dialogue, you'll have a focused research question and methodology direction.
 
 ### Example: Write a paper
 

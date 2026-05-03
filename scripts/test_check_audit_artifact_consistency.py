@@ -1940,6 +1940,8 @@ class TestCLI:
         # End-to-end smoke: invoke the script directly (no `python` prefix)
         # and confirm it produces the documented harness exit code. Belt
         # and braces against future `chmod 644` regressions.
+        if sys.platform == "win32":
+            pytest.skip("Direct shebang execution is POSIX-specific; Windows uses sys.executable.")
         script_path = REPO / "scripts/check_audit_artifact_consistency.py"
         result = subprocess.run(
             [str(script_path), "--example-validation-harness"],

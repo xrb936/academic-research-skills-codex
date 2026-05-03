@@ -8,42 +8,44 @@ in the lint contract — without these tests, CI would only verify that the
 accepts weakened obligations would be caught only by ad-hoc mutation runs.
 
 The test suite operates on a sandboxed copy of the repo: each test
-constructs the copy via `git archive HEAD | tar -x`, applies a single
-mutation, and runs `scripts/check_v3_6_7_pattern_protection.py` against
-that copy. The repo's actual files are never modified.
+constructs the copy via `git archive HEAD`, applies a single mutation, and
+runs `scripts/check_v3_6_7_pattern_protection.py` against that copy. The
+repo's actual files are never modified.
 """
 from __future__ import annotations
 
 import subprocess
+import sys
+import tarfile
 import tempfile
 import unittest
-from pathlib import Path
+from io import BytesIO
+from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 LINT_SCRIPT_REL = "scripts/check_v3_6_7_pattern_protection.py"
 
 
 def _archive_repo(dest: Path) -> None:
-    """Materialise current `HEAD` into `dest` via git archive | tar."""
-    archive = subprocess.Popen(
-        ["git", "archive", "HEAD"], cwd=REPO_ROOT, stdout=subprocess.PIPE
+    """Materialise current `HEAD` into `dest` via git archive."""
+    archive = subprocess.run(
+        ["git", "archive", "--format=tar", "HEAD"],
+        cwd=REPO_ROOT,
+        stdout=subprocess.PIPE,
+        check=True,
     )
-    try:
-        subprocess.run(
-            ["tar", "-x", "-C", str(dest)], stdin=archive.stdout, check=True
-        )
-    finally:
-        if archive.stdout is not None:
-            archive.stdout.close()
-        archive.wait()
-    if archive.returncode != 0:
-        raise RuntimeError(f"git archive failed: rc={archive.returncode}")
+    with tarfile.open(fileobj=BytesIO(archive.stdout), mode="r:") as tar:
+        for member in tar.getmembers():
+            parts = PurePosixPath(member.name).parts
+            if parts and parts[0].startswith("."):
+                continue
+            tar.extract(member, dest)
 
 
 def _run_lint(repo_dir: Path) -> tuple[int, str, str]:
     """Run the v3.6.7 lint inside `repo_dir`. Returns (rc, stdout, stderr)."""
     proc = subprocess.run(
-        ["python3", LINT_SCRIPT_REL],
+        [sys.executable, LINT_SCRIPT_REL],
         cwd=repo_dir,
         text=True,
         stdout=subprocess.PIPE,

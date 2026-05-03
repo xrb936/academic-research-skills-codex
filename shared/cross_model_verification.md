@@ -4,7 +4,7 @@
 
 This protocol enables optional cross-model verification for high-stakes AI judgments. When enabled, a second AI model independently reviews outputs from the primary model, reducing shared-bias blind spots.
 
-**This is entirely optional.** All ARS skills work with Claude Opus 4.7 alone. Cross-model verification is an additional layer for users who want higher confidence in integrity checks, devil's advocate challenges, and review judgments.
+**This is entirely optional.** All ARS skills work with the current Codex model alone. Cross-model verification is an additional layer for users who want higher confidence in integrity checks, devil's advocate challenges, and review judgments.
 
 ## Why Cross-Model Verification
 
@@ -18,20 +18,20 @@ A stress test of 68 AI-generated citations found 31% had problems — and all pa
 
 | Model | API ID | Provider | Best For |
 |-------|--------|----------|----------|
-| Claude Opus 4.7 | `claude-opus-4-7` | Anthropic | Primary model (default for all ARS skills) |
+| Current Codex model | session configuration | OpenAI / configured Codex provider | Primary model |
 | GPT-5.4 Pro | `gpt-5.4-pro` | OpenAI | Cross-verification — strongest reasoning |
 | GPT-5.4 | `gpt-5.4` | OpenAI | Cross-verification — balanced cost/performance |
 | Gemini 3.1 Pro | `gemini-3.1-pro-preview` | Google | Cross-verification — strong at factual verification |
 
-**Recommended cross-verification pair:** Claude Opus 4.7 (primary) + GPT-5.4 Pro or Gemini 3.1 Pro (verifier).
+**Recommended cross-verification pair:** current Codex primary + a verifier that is not the same model/configuration. Prefer a different provider when independence matters.
 
-Using two non-Anthropic models as primary+verifier is possible but not tested with ARS prompts.
+Using the same provider for primary+verifier is possible but provides weaker independence than a true cross-provider check.
 
 ## Setup Guide
 
 ### Prerequisites
 
-You need API keys from at least one additional provider. ARS itself runs inside Claude Code, so Claude is always available as the primary model.
+You need API keys for whichever external verifier you choose. ARS itself runs inside Codex, so the primary model is whatever the current Codex session is configured to use.
 
 ### Step 1: Get API Keys
 
@@ -63,7 +63,7 @@ Then reload: `source ~/.zshrc`
 
 ### Step 3: Verify Setup
 
-In Claude Code, you can test by asking:
+In Codex, you can test by asking:
 ```
 Check if cross-model verification is available for ARS
 ```
@@ -87,9 +87,9 @@ unset ARS_CROSS_MODEL
 ### Integrity Verification (academic-pipeline, Stage 2.5 / 4.5)
 
 **When `ARS_CROSS_MODEL` is set:**
-- Primary model (Claude) runs full Phase A-E verification as normal
+- Primary model runs full Phase A-E verification as normal
 - After Phase A completes, a random 30% sample of references is sent to the cross-model for independent verification
-- Cross-model receives only the reference text and paper context — not Claude's verification result (to prevent anchoring)
+- Cross-model receives only the reference text and paper context — not the primary model's verification result (to prevent anchoring)
 - Disagreements are flagged as `[CROSS-MODEL-DISAGREEMENT]` and prioritized for human review
 
 **When `ARS_CROSS_MODEL` is not set:**
@@ -114,7 +114,7 @@ When the integrity_verification_agent detects `ARS_CROSS_MODEL` in the environme
    ... (up to 5 per batch)
    ```
 4. Send to the cross-model via the appropriate API (see API Call Patterns below)
-5. Compare results: if Claude said VERIFIED but cross-model said NOT_FOUND or MISMATCH, flag as `[CROSS-MODEL-DISAGREEMENT]`
+5. Compare results: if the primary model said VERIFIED but cross-model said NOT_FOUND or MISMATCH, flag as `[CROSS-MODEL-DISAGREEMENT]`
 6. Include disagreements in the integrity report under a new section:
    ```markdown
    ### Cross-Model Verification Results
@@ -122,7 +122,7 @@ When the integrity_verification_agent detects `ARS_CROSS_MODEL` in the environme
    - Agreements: N
    - Disagreements: M (listed below, prioritized for human review)
 
-   | # | Reference | Claude | Cross-Model | Status |
+   | # | Reference | Primary Model | Cross-Model | Status |
    |---|-----------|--------|-------------|--------|
    ```
 
@@ -167,7 +167,7 @@ The DA agent, after completing its checkpoint report, should:
 
 ### OpenAI (GPT-5.4 / GPT-5.4 Pro)
 
-In Claude Code, the agent can use the Bash tool to make API calls:
+In Codex, the agent can use a shell command to make API calls when network access and API keys are available:
 
 ```bash
 curl -s https://api.openai.com/v1/chat/completions \

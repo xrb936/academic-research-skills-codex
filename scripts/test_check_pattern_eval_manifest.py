@@ -165,7 +165,12 @@ def _run_script(fixture_root: Path) -> subprocess.CompletedProcess:
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() or target.is_symlink():
         target.unlink() if target.is_symlink() else shutil.rmtree(target)
-    target.symlink_to(fixture_root, target_is_directory=True)
+    try:
+        target.symlink_to(fixture_root, target_is_directory=True)
+    except OSError:
+        # Windows runners often lack symlink privileges; a copy preserves the
+        # same fixture layout for manifest validation.
+        shutil.copytree(fixture_root, target)
     return subprocess.run(
         [sys.executable, str(repo_clone / "scripts" / SCRIPT.name)],
         capture_output=True,

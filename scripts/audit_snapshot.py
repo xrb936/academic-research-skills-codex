@@ -122,6 +122,8 @@ def _extract_template_sections(template_str: str, section_numbers: list[int]) ->
     """
     import re as _re
 
+    template_str = template_str.replace("\r\n", "\n")
+
     # Mask fenced code blocks (```...``` and ~~~...~~~) with whitespace so
     # ## headings inside them don't count as section boundaries. Length is
     # preserved so match offsets stay aligned with the original string.

@@ -1,6 +1,6 @@
 ---
 description: ARS academic-paper `disclosure` mode — venue-specific AI-usage statement
-model: sonnet
+model: inherit
 ---
 
 Trigger the `academic-paper` skill in `disclosure` mode. Produces a venue-specific AI-usage disclosure statement (ICLR / NeurIPS / Nature / Science / ACL / EMNLP supported). Fidelity spectrum, low oversight.
