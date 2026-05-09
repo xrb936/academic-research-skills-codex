@@ -93,7 +93,7 @@ Meta-lesson from this analysis: "we already do something adjacent" is weaker tha
 
 ## [3.7.0] - 2026-05-05
 
-> **Codex plugin metadata adaptation.** Upstream v3.7.0 added Claude Code
+> **Codex plugin metadata adaptation.** Upstream v3.7.0 added provider-specific
 > plugin packaging. This fork keeps the packaging intent but uses
 > `.codex-plugin/plugin.json` for plugin-aware Codex environments, while the
 > direct `git clone` + symlink/copy flow under `~/.codex/skills/` remains the
@@ -104,11 +104,11 @@ Meta-lesson from this analysis: "we already do something adjacent" is weaker tha
 - **Codex plugin manifest** (adapted from upstream Phase 1, PR #68).
   `.codex-plugin/plugin.json` declares the suite for plugin-aware Codex
   environments and points at the existing four skill directories without
-  restoring the Claude Code `.claude-plugin/` entrypoint.
+  restoring the provider-specific plugin entrypoint from upstream.
 - **10 slash commands** at `commands/ars-*.md` (Phase 2.1, PR #69) mapping
   `MODE_REGISTRY.md` entries to `/ars-<mode>` style triggers. The
   Codex-adapted command frontmatter uses `model: inherit` so commands follow
-  the current Codex session rather than pinning Claude-specific model names.
+  the current Codex session rather than pinning provider-specific model tiers.
 - **3 plugin-shipped agents** at `agents/*_agent.md` (Phase 2.1, PR #69)
   as relative symlinks to the v3.6.7-hardened downstream agents in
   `deep-research/agents/`: `synthesis_agent`, `research_architect_agent`,
@@ -120,9 +120,9 @@ Meta-lesson from this analysis: "we already do something adjacent" is weaker tha
 - **`model: inherit`** retained on the three source agent frontmatters
   (PR #69 R1 codex finding). In the Codex fork, inherit means these agent
   pointers follow the current Codex session/model configuration.
-- **Claude SessionStart announce hook omitted**. The upstream
+- **Provider-specific SessionStart announce hook omitted**. The upstream
   `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` path depends on
-  `${CLAUDE_PLUGIN_ROOT}` and Claude Code hook semantics, so it is not wired
+  a hook runtime Codex does not expose through `.codex-plugin/plugin.json`, so it is not wired
   into the Codex plugin metadata.
 - **`docs/PERFORMANCE.md` + `.zh-TW.md`** subsection
   "v3.7.0 Plugin agents and model routing" explaining `model: inherit`
@@ -169,7 +169,7 @@ install users see no breaking change.
 
 8 inline iterative rounds + 3 fresh PR-level rounds across the three
 PRs (#68 / #69 / #70), all converging to 0 P0/P1/P2 findings before
-merge. The upstream Phase 2.2 fresh PR review caught one P2 in the Claude
+merge. The upstream Phase 2.2 fresh PR review caught one P2 in the provider-specific
 hook path. The Codex fork omits that hook path and keeps the finding as
 upstream implementation history.
 Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
@@ -305,7 +305,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
   writer/evaluator pair via contract-gated phase splits and Schema 13.1
   conditional gates. No new agent files; existing `draft_writer_agent` and
   `peer_reviewer_agent` gain per-phase sub-section instructions") lands in
-  the private ROADMAP.md (gitignored, lives in claude-memory-sync), not in
+  the private ROADMAP.md (gitignored, lives in codex-memory-sync), not in
   this repo PR.
 
 ## [3.6.7] - 2026-04-30
@@ -414,28 +414,28 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 
 ### Changed
 
-- **`docs/SETUP.md` Method 4 (claude.ai) recommendation revised**. Method 4b
+- **`docs/SETUP.md` Method 4 (Codex web) recommendation revised**. Method 4b
   (Project + GitHub integration) is now presented first as the recommended
-  claude.ai path, since it brings the repository into Project knowledge for
+  Codex web path, since it brings the repository into Project knowledge for
   reading and citation without losing fidelity. Method 4a (Custom Skill upload)
   is now explicitly marked as **not recommended for this suite**, with a
   rationale paragraph covering two compounding reasons:
-  - ARS depends on Claude Code-only orchestration features. Each skill drives
-    12-13 specialised agents through Claude Code's Task / subagent tooling
+  - ARS depends on Codex-only orchestration features. Each skill drives
+    12-13 specialised agents through Codex's Task / subagent tooling
     and Material Passport file handoffs that resume across sessions.
-    claude.ai Custom Skills do support multi-file packages with `scripts/`
-    and code execution per Anthropic's documentation, but the Anthropic-
-    documented scope of the claude.ai Custom Skill runtime does not include
-    Claude Code's Task / subagent control surface or cross-session Material
+    Codex web Custom Skills do support multi-file packages with `scripts/`
+    and code execution per platform's documentation, but the platform-
+    documented scope of the Codex web Custom Skill runtime does not include
+    Codex's Task / subagent control surface or cross-session Material
     Passport handoffs. The recommendation is forward-looking based on those
     documented assumptions; we have not run a live upload to characterise
-    the actual surfacing in claude.ai.
-  - Trimming the four `description` fields below claude.ai's 200-character cap
-    would weaken Claude Code and Cowork routing on the platforms the suite was
-    actually built for. The Agent Skills specification and Claude Code Skills
-    documentation both allow up to 1,024 characters; only claude.ai's upload
-    UI enforces 200. Trading Claude Code and Cowork routing precision for
-    partial functionality on the limited claude.ai path was judged not worth
+    the actual surfacing in Codex web.
+  - Trimming the four `description` fields below Codex web's 200-character cap
+    would weaken Codex and Cowork routing on the platforms the suite was
+    actually built for. The Agent Skills specification and Codex Skills
+    documentation both allow up to 1,024 characters; only Codex web's upload
+    UI enforces 200. Trading Codex and Cowork routing precision for
+    partial functionality on the limited Codex web path was judged not worth
     it.
 - **Method 4a install commands kept in place** for users who decide to try it
   anyway, framed as "if you want to try this path despite the limitations"
@@ -449,11 +449,11 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 - Doc-only patch. No `SKILL.md` (frontmatter or body), no agent file, no
   schema, no script, no test, no workflow, and no version bump in any skill
   changed in this patch. The four current `description` fields stay at their
-  Claude Code-native lengths (440-842 characters) so routing on Claude Code
+  Codex-native lengths (440-842 characters) so routing on Codex
   and Cowork remains intact.
 - This patch is a scope change from the v3.6.5.2 originally forecast in the
   v3.6.5.1 SETUP doc. The earlier plan was a description trim; on review, the
-  trim direction was abandoned because it would have damaged Claude Code and
+  trim direction was abandoned because it would have damaged Codex and
   Cowork routing to unblock a path that delivers an untested partial fit
   anyway. The v3.6.5.1 SETUP text's forward-promise of a description trim is
   removed here.
@@ -467,35 +467,35 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 ### Fixed
 
 - **`docs/SETUP.md` Method 3 install paths** — Option A (symlink) and Option B (copy)
-  now install each of the four skill folders separately into `~/.claude/skills/<skill-name>/`,
+  now install each of the four skill folders separately into `~/.codex/skills/<skill-name>/`,
   matching the `<install-root>/<skill-name>/SKILL.md` discovery convention. The previous
-  text installed the whole repo under `~/.claude/skills/academic-research-skills/`, which
-  buried the four `SKILL.md` files one level too deep for Cowork / Claude Code discovery.
-- **`docs/SETUP.md` Method 4 (claude.ai) restructured** — split into Method 4a
-  (Custom Skill upload via Settings → Capabilities → Skills, the standard claude.ai Skill
+  text installed the whole repo under `~/.codex/skills/academic-research-skills/`, which
+  buried the four `SKILL.md` files one level too deep for Cowork / Codex discovery.
+- **`docs/SETUP.md` Method 4 (Codex web) restructured** — split into Method 4a
+  (Custom Skill upload via Settings → Capabilities → Skills, the standard Codex web Skill
   install path) and Method 4b (Project + GitHub integration, fallback knowledge mode and
   not a Skill install). The previous text framed GitHub integration as a Skill install
   path, which conflated content retrieval with skill execution. Method 4a documents the
   current 200-character `description` cap blocker (this entry originally forecast a
   description trim in v3.6.5.2; see the v3.6.5.2 entry above for the actual decision —
   Method 4a is documented as not recommended for this suite, and descriptions remain at
-  their Claude Code-native lengths).
+  their Codex-native lengths).
 - **Method 3 prerequisites** — expanded from one sentence to a full prerequisites
-  subsection covering Claude Desktop version, internet connectivity, Cowork process model,
+  subsection covering Codex desktop version, internet connectivity, Cowork process model,
   folder permissions, paid plan, and Team/Enterprise org-admin controls.
 - **Method 4 prerequisites** — split per sub-method. 4a documents zip structure +
   description cap surfacing as upload-time errors; 4b documents GitHub authentication via
-  the Anthropic connector, private-repo App authorization, and Team/Enterprise owner-level
+  the platform connector, private-repo App authorization, and Team/Enterprise owner-level
   connector enablement.
 - **Cowork UI terminology** — replaced "Cowork tab" / "working directory" with current
   Cowork UI labels: mode selector (Chat / Cowork), Tasks view, "Use an existing folder"
   in the left navigation panel, and Cowork Project as the canonical term.
-- **Skill invocation framing** — clarified that Claude uses each skill's `description`
+- **Skill invocation framing** — clarified that Codex uses each skill's `description`
   for relevance routing rather than literal trigger-phrase matching, and documented the
   Cowork `/` command palette and `+` capability picker as explicit invocation surfaces.
 - **Method 4 directory table** — added the `scripts/` row (required for Material Passport
   `literature_corpus[]` adapters and schema validators) and refreshed the project-capacity
-  guidance against current Anthropic Project file limits (per-file 30 MB; file count is
+  guidance against current web project file limits (per-file 30 MB; file count is
   not artificially capped at 200).
 - **`docs/SETUP.zh-TW.md`** — mirrored the English rewrite end-to-end so Traditional
   Chinese readers see the same structure and content for Methods 1-4.
@@ -507,7 +507,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 - Doc-only patch. No skill content (`SKILL.md`), no agent file, no schema, no script,
   and no test changed in this patch.
 - Issue [#44](https://github.com/Imbad0202/academic-research-skills/issues/44) (philpav)
-  reports SETUP problems on Cowork and claude.ai. v3.6.5.1 fixes the SETUP doc;
+  reports SETUP problems on Cowork and Codex web. v3.6.5.1 fixes the SETUP doc;
   this entry originally forecast a `SKILL.md` description-length fix in v3.6.5.2,
   but v3.6.5.2 instead documents Method 4a as not recommended for this suite (see
   the v3.6.5.2 entry above for the actual decision). Issue #44 receives a single
@@ -538,7 +538,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
   syncs Version Info footer that lagged at 2.9.0).
 - `academic-paper/SKILL.md` 3.1.0 → 3.1.1 — literature_strategist_agent corpus-first flow.
 - `academic-pipeline/SKILL.md` 3.6.4 → 3.6.5 — suite version invariant.
-- `.claude/CLAUDE.md`, `MODE_REGISTRY.md`, `README.md`, `README.zh-TW.md`,
+- `AGENTS.md`, `MODE_REGISTRY.md`, `README.md`, `README.zh-TW.md`,
   `scripts/check_spec_consistency.py` updated for the version bump (suite version,
   badge, tag, changelog heading).
 
@@ -570,7 +570,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 - `academic-pipeline/references/passport_as_reset_boundary.md`: "deferred to v3.6.4, PR-B" placeholders replaced with forward references to `adapters/overview.md` and `literature_corpus_entry.schema.json`.
 - `shared/handoff_schemas.md`: Schema 9 optional fields table adds `literature_corpus`; new "Literature Corpus Input Port (v3.6.4)" subsection appended after Reset Boundary Extension.
 - `academic-pipeline/SKILL.md` bumped 3.6.3 → 3.6.4 (suite version invariant). Other skills retain independent semver.
-- `.claude/CLAUDE.md`, `MODE_REGISTRY.md`, `README.md`, `README.zh-TW.md`, `scripts/check_spec_consistency.py` updated for the version bump (suite version, badge, tag, changelog heading).
+- `AGENTS.md`, `MODE_REGISTRY.md`, `README.md`, `README.zh-TW.md`, `scripts/check_spec_consistency.py` updated for the version bump (suite version, badge, tag, changelog heading).
 
 ### Not changed (explicit non-goals)
 
@@ -581,7 +581,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 
 ### Added
 - **Opt-in passport reset boundary** via `ARS_PASSPORT_RESET=1`. Every FULL checkpoint becomes a context-reset boundary when the flag is set. `systematic-review` mode with the flag ON makes reset mandatory; other modes treat reset as the flag-gated default.
-- **`resume_from_passport=<hash>` mode** in `academic-pipeline`. Lets users resume a pipeline run in a fresh Claude Code session from the Material Passport ledger alone.
+- **`resume_from_passport=<hash>` mode** in `academic-pipeline`. Lets users resume a pipeline run in a fresh Codex session from the Material Passport ledger alone.
 - **Schema 9 `reset_boundary[]`** optional append-only field with two entry kinds (`boundary`, `resume`). Entry shape in `shared/contracts/passport/reset_ledger_entry.schema.json` (oneOf split with `kind` discriminator). Hash computed via JSON Canonical Form + SHA-256 with `"000000000000"` placeholder for self-reference safety. Optional `pending_decision` field handles MANDATORY branch choices (Stage 3 reject/restructure/abort, Stage 5 finalization) that survive the reset boundary.
 - **Protocol doc:** `academic-pipeline/references/passport_as_reset_boundary.md` (authoritative; every file mentioning `ARS_PASSPORT_RESET` must co-locate a reference).
 - **CI lint:** `scripts/check_passport_reset_contract.py` + unittest suite. Wired into `.github/workflows/spec-consistency.yml`.
@@ -658,8 +658,8 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 - `academic-pipeline/agents/pipeline_orchestrator_agent.md` — checkpoint Steps flow amended: after `state_tracker` update the orchestrator invokes `collaboration_depth_agent` on the just-completed stage's dialogue range (FULL/SLIM only; MANDATORY integrity gates explicitly skip) and injects its output into checkpoint templates as a named "Collaboration Depth" section. FULL checkpoint template expanded with the observer block; SLIM template gains a one-line compact observer summary; MANDATORY template unchanged (integrity gates never dilute). New "Collaboration Depth Observer" subsection under §3 Checkpoint Management covers invocation, cross-model behaviour, short-stage guard, and non-blocking IRON RULE.
 - `academic-pipeline/agents/state_tracker_agent.md` — Write Access Control adds `collaboration_depth_agent` (append-only `collaboration_depth_history[]`). New `dialogue_log_ref` turn-range pointer per stage; new `collaboration_depth_history[]` root-level array; new `append_observer_report()` function (only function that writes the history; preconditions block any attempt to turn observer output into a blocking condition).
 - `scripts/_skill_lint.py` — new shared `split_frontmatter(text) -> (dict|None, str)` lenient helper, reused by the new lint.
-- Suite version bumped to `3.5.0` across `README.md`, `README.zh-TW.md`, `MODE_REGISTRY.md`, `.claude/CLAUDE.md`; new `### v3.5.0 (2026-04-21)` section in both READMEs; new `## v3.5 Key Additions` block in `.claude/CLAUDE.md`.
-- `scripts/check_spec_consistency.py` — README version expectations bumped to `v3.5.0`; `MODE_REGISTRY.md` last-updated expectation updated; `.claude/CLAUDE.md` suite version expectation updated. New embedded-changelog regression checks for `### v3.5.0 (2026-04-21)` entries.
+- Suite version bumped to `3.5.0` across `README.md`, `README.zh-TW.md`, `MODE_REGISTRY.md`, `AGENTS.md`; new `### v3.5.0 (2026-04-21)` section in both READMEs; new `## v3.5 Key Additions` block in `AGENTS.md`.
+- `scripts/check_spec_consistency.py` — README version expectations bumped to `v3.5.0`; `MODE_REGISTRY.md` last-updated expectation updated; `AGENTS.md` suite version expectation updated. New embedded-changelog regression checks for `### v3.5.0 (2026-04-21)` entries.
 
 ### Notes
 - MANDATORY integrity checkpoints (Stages 2.5, 4.5) are **not** instrumented by the observer. The observer never appears in the "Flagged" line of any checkpoint. `blocked_by: collaboration_depth_agent` is never a legal state. The orchestrator's numbered Step 3 explicitly branches on checkpoint_type.
@@ -691,7 +691,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 - `academic-paper/SKILL.md` (v3.0.2 → v3.1.0): `full` mode adds pre-finalize RAISE principles-only check (warn-only). `disclosure` mode unchanged and complementary.
 - `.github/workflows/spec-consistency.yml`: added compliance validator + unit test runner steps.
 - `scripts/check_spec_consistency.py`: version pins bumped.
-- `README.md`, `README.zh-TW.md`, `.claude/CLAUDE.md`, `MODE_REGISTRY.md`: suite version → 3.4.0.
+- `README.md`, `README.zh-TW.md`, `AGENTS.md`, `MODE_REGISTRY.md`: suite version → 3.4.0.
 
 ### Notes
 
@@ -705,12 +705,12 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 ### Added
 - `docs/ARCHITECTURE.md` — single source of truth for pipeline structure (flow, stage × dimension matrix, data-access flow, skill dependency graph, quality gates, modes). Merged into main via PR #18.
 - `docs/SETUP.md` + `docs/SETUP.zh-TW.md` — prerequisites, API keys, Pandoc / tectonic setup, cross-model verification (`ARS_CROSS_MODEL`), and four installation methods.
-- `docs/PERFORMANCE.md` + `docs/PERFORMANCE.zh-TW.md` — per-mode token budgets, full-pipeline cost estimate, and recommended Claude Code settings (Agent Team, Ralph Loop, Skip Permissions).
+- `docs/PERFORMANCE.md` + `docs/PERFORMANCE.zh-TW.md` — per-mode token budgets, full-pipeline cost estimate, and recommended Codex settings (Agent Team, Ralph Loop, Skip Permissions).
 
 ### Changed
 - `README.md` and `README.zh-TW.md` streamlined: removed the ASCII pipeline diagram and the 16-point key-feature list (superseded by `docs/ARCHITECTURE.md`). Setup, performance, and installation sections relocated to `docs/`. Skill Details now anchors version numbers and routes readers to ARCHITECTURE.md §3 for per-agent rosters.
 - `scripts/check_spec_consistency.py` — bumped README version expectations to `v3.3.6`; DOCX contract expectations (both EN and zh-TW) moved from READMEs to the new `docs/SETUP.*` docs; added `check_setup_docs()` step.
-- Suite version bumped to `3.3.6` across `README.md`, `README.zh-TW.md`, `.claude/CLAUDE.md`, and `MODE_REGISTRY.md`.
+- Suite version bumped to `3.3.6` across `README.md`, `README.zh-TW.md`, `AGENTS.md`, and `MODE_REGISTRY.md`.
 
 ### Notes
 - No functional change to any skill. Pure documentation reorganization.
@@ -718,7 +718,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 ## [3.3.5] - 2026-04-15
 
 ### Added
-- `shared/benchmark_report.schema.json` — JSON Schema (draft-2020-12) defining required fields for ARS benchmark reports. Catches the "n=2 author-conducted baseline" failure mode from Anthropic's automated-w2s-researcher paper.
+- `shared/benchmark_report.schema.json` — JSON Schema (draft-2020-12) defining required fields for ARS benchmark reports. Catches the "n=2 author-conducted baseline" failure mode from the automated-w2s-researcher study paper.
 - `shared/benchmark_report_pattern.md` — narrative hub doc explaining the schema.
 - `scripts/check_benchmark_report.py` + tests — validator with self-scored and small-sample warnings.
 - `examples/benchmark_report_template.json` — fillable template.
@@ -757,7 +757,7 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 ## [3.3.2] - 2026-04-15
 
 ### Added
-- `metadata.data_access_level` field on every top-level SKILL.md. Three-tier vocabulary (`raw` | `redacted` | `verified_only`) declaring what kind of data each skill may consume. Inspired by the three-tier isolation pattern in Anthropic's automated-w2s-researcher (2026).
+- `metadata.data_access_level` field on every top-level SKILL.md. Three-tier vocabulary (`raw` | `redacted` | `verified_only`) declaring what kind of data each skill may consume. Inspired by the three-tier isolation pattern in the automated-w2s-researcher study (2026).
   - `deep-research` = `raw`
   - `academic-paper` = `redacted`
   - `academic-paper-reviewer` = `verified_only`
@@ -771,12 +771,12 @@ Reference: `feedback_codex_review_vs_resume_audit_scope.md`.
 
 ### Changed
 - Per-skill `metadata.version` patch-bumped on all 4 SKILL.md files; `last_updated` refreshed to 2026-04-15.
-- Suite version bumped to 3.3.2 across `README.md`, `README.zh-TW.md`, and `.claude/CLAUDE.md`.
+- Suite version bumped to 3.3.2 across `README.md`, `README.zh-TW.md`, and `AGENTS.md`.
 
 ## [3.3.1] - 2026-04-14
 
 ### Fixed
-- Public contract drift across `README.md`, `README.zh-TW.md`, `.claude/CLAUDE.md`, `MODE_REGISTRY.md`, and the affected `SKILL.md` files
+- Public contract drift across `README.md`, `README.zh-TW.md`, `AGENTS.md`, `MODE_REGISTRY.md`, and the affected `SKILL.md` files
 - Cross-model wording now matches the implemented scope: integrity sample verification and independent DA critique are shipped; sixth-reviewer peer review remains planned
 - `academic-pipeline` checkpoint docs now state that SLIM checkpoints still wait for explicit user confirmation
 - `academic-pipeline` integrity gate docs now consistently state that Stage 2.5 and Stage 4.5 cannot be skipped
@@ -825,7 +825,7 @@ Integrates insights from Lu et al. (2026, *Nature* 651:914-919) — the first en
 - **README Positioning Update**: "Why human-in-the-loop, not full automation?" section citing Lu 2026 as external evidence for ARS's design thesis. Both EN and zh-TW updated.
 
 ### Changed
-- `.claude/CLAUDE.md`: synced all skill versions and mode lists to reality (deep-research v2.7, academic-paper v2.9, academic-paper-reviewer v1.8, academic-pipeline v3.1)
+- `AGENTS.md`: synced all skill versions and mode lists to reality (deep-research v2.7, academic-paper v2.9, academic-paper-reviewer v1.8, academic-pipeline v3.1)
 - `quality_rubrics.md`: added "Known error profile" preamble explaining rubric scores are ordinally but not cardinally interpretable without calibration
 
 **Version bumps**: academic-paper v2.9, academic-paper-reviewer v1.8, academic-pipeline v3.1

@@ -9,7 +9,7 @@
 
 ## Why this exists
 
-The Anthropic automated-w2s-researcher (2026) paper headlined a performance comparison:
+The automated-w2s-researcher (2026) paper headlined a performance comparison:
 "2 researchers × 7 days (PGR=0.23) vs 9 agents × 5 days (PGR=0.97)."
 
 Dramatic. Also: n=2, author-conducted, no independence, self-scored. Not a scientific

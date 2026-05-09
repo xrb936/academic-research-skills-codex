@@ -21,7 +21,7 @@ raise:
     human_oversight:
       - "[weak evidence] Section 4: manuscript states 'the first author reviewed AI outputs' with no further detail on review protocol, criteria, or proportion of outputs checked."
     transparency:
-      - "Methods 2.2: model name (claude-sonnet-4-6), API version, and prompt template included as supplementary material."
+      - "Methods 2.2: model name (gpt-5.5), API version, and prompt template included as supplementary material."
       - "Author contribution statement: AI use declared per journal policy."
     reproducibility:
       - "GitHub repository github.com/example/study2026: analysis scripts and prompts archived under MIT license."

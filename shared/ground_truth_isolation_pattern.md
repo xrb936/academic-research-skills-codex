@@ -25,7 +25,7 @@ strong on paper and fail on genuinely held-out evaluation.
 
 Two published cases make this concrete and directly inform the ARS design.
 
-Anthropic's automated-w2s-researcher (2026) uses a three-tier sandbox: local
+The automated-w2s-researcher study (2026) uses a three-tier sandbox: local
 mode for development, docker-with-redacted-data for integration testing, and
 RunPod with server-side ground truth as the only valid evaluation tier. The
 architecture exists because earlier iterations without this separation produced
@@ -216,7 +216,7 @@ The isolation pattern is fully stated at the declarative and documentation
 level. Several natural extensions are foreseeable but explicitly out of scope
 for this release: a server-side rubric endpoint that supplies evaluation
 criteria to reviewer agents without exposing them in the local context window
-(directly analogous to the RunPod tier in Anthropic's w2s sandbox); per-agent
+(directly analogous to the RunPod tier in the w2s sandbox); per-agent
 rather than per-skill access levels, allowing a multi-mode skill to tag
 individual agent definition files with the layer they operate on; runtime
 verification that the Material Passport's declared `data_access_level` chain

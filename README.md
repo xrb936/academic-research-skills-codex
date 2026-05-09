@@ -51,7 +51,7 @@ The architecture doc supersedes the sprawling pipeline description that used to 
 - **Academic Paper** — 12-agent paper writing with Style Calibration, Writing Quality Check, LaTeX hardening, visualization, revision coaching, citation conversion, anti-leakage protocol, and VLM figure verification.
 - **Academic Paper Reviewer** — 7-agent multi-perspective peer review with 0–100 quality rubrics (EIC + 3 dynamic reviewers + Devil's Advocate), concession threshold protocol, attack intensity preservation, optional cross-model DA critique / calibration, R&R traceability matrix, read-only constraint.
 - **Academic Pipeline** — 10-stage pipeline orchestrator with adaptive checkpoints, claim verification, Material Passport, optional `repro_lock`, optional cross-model integrity verification, mid-conversation reinforcement, and score trajectory tracking.
-- **Data Access Level Metadata** (v3.3.2+) — every skill declares `data_access_level` (`raw` / `redacted` / `verified_only`); enforced by `scripts/check_data_access_level.py`. Pattern adapted from Anthropic's automated-w2s-researcher (2026). See [`shared/ground_truth_isolation_pattern.md`](shared/ground_truth_isolation_pattern.md).
+- **Data Access Level Metadata** (v3.3.2+) — every skill declares `data_access_level` (`raw` / `redacted` / `verified_only`); enforced by `scripts/check_data_access_level.py`. Pattern adapted from the automated-w2s-researcher study (2026). See [`shared/ground_truth_isolation_pattern.md`](shared/ground_truth_isolation_pattern.md).
 - **Task Type Annotation** (v3.3.2+) — every skill declares `task_type` (`open-ended` or `outcome-gradable`). All current ARS skills are `open-ended`.
 - **Benchmark Report Schema** (v3.3.5+) — JSON Schema + lint for honest benchmark comparisons. See [`shared/benchmark_report_pattern.md`](shared/benchmark_report_pattern.md).
 - **Artifact Reproducibility Lockfile** (v3.3.5+) — optional `repro_lock` sub-block on Material Passport. **Configuration documentation, not replay guarantee** — LLM outputs are not byte-reproducible. See [`shared/artifact_reproducibility_pattern.md`](shared/artifact_reproducibility_pattern.md).
@@ -281,7 +281,7 @@ https://github.com/Imbad0202/academic-research-skills
 
 **Cheng-I Wu** (吳政宜) — Author and maintainer
 
-**[aspi6246](https://github.com/aspi6246)** — Contributor. The v3.1 optimization was inspired by patterns from [Claude-Code-Skills-for-Academics](https://github.com/aspi6246/Claude-Code-Skills-for-Academics): read-only constraint pattern, anti-pattern codification as first-class design, cognitive framework approach (teaching "how to think" not just procedures), and lean skill size philosophy.
+**[aspi6246](https://github.com/aspi6246)** — Contributor. The v3.1 optimization was inspired by patterns from a prior academic skills repository: read-only constraint pattern, anti-pattern codification as first-class design, cognitive framework approach (teaching "how to think" not just procedures), and lean skill size philosophy.
 
 **[mchesbro1](https://github.com/mchesbro1)** — Contributor. Originally proposed and drafted the IS Basket of 8 journals for `academic-paper-reviewer/references/top_journals_by_field.md` ([Issue #5](https://github.com/Imbad0202/academic-research-skills/issues/5)).
 
@@ -293,12 +293,12 @@ https://github.com/Imbad0202/academic-research-skills
 
 ### v3.7.0 (2026-05-05) — Codex Plugin Metadata Adaptation
 
-> The upstream v3.7.0 release added Claude Code plugin packaging. This fork keeps the new packaging intent, but translates the active entrypoint to Codex: `.codex-plugin/plugin.json` describes the suite, while direct `git clone` + symlink or copy install under `~/.codex/skills/` remains the most portable workflow.
+> The upstream v3.7.0 release added provider-specific plugin packaging. This fork keeps the new packaging intent, but translates the active entrypoint to Codex: `.codex-plugin/plugin.json` describes the suite, while direct `git clone` + symlink or copy install under `~/.codex/skills/` remains the most portable workflow.
 
-- **Codex plugin manifest**. `.codex-plugin/plugin.json` declares the suite for plugin-aware Codex environments and points at the existing four skill directories. The Claude Code `.claude-plugin/` marketplace files are not restored in this fork.
-- **10 command prompt files** at `commands/ars-*.md` map `MODE_REGISTRY.md` entries to `/ars-<mode>` style triggers. Their frontmatter now uses `model: inherit`, so they follow the current Codex session rather than pinning Opus / Sonnet names from the upstream Claude package.
+- **Codex plugin manifest**. `.codex-plugin/plugin.json` declares the suite for plugin-aware Codex environments and points at the existing four skill directories. The provider-specific marketplace files from upstream are not restored in this fork.
+- **10 command prompt files** at `commands/ars-*.md` map `MODE_REGISTRY.md` entries to `/ars-<mode>` style triggers. Their frontmatter now uses `model: inherit`, so they follow the current Codex session rather than pinning provider-specific model tiers from the upstream package.
 - **3 plugin-adjacent agent pointers** at `agents/*_agent.md` remain relative symlinks to the v3.6.7-hardened downstream agents in `deep-research/agents/`: `synthesis_agent`, `research_architect_agent`, `report_compiler_agent`. Symlinks preserve a single source of truth and keep the existing pattern-protection lint paths intact.
-- **Claude SessionStart hook omitted**. The upstream `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` path depends on `${CLAUDE_PLUGIN_ROOT}` and Claude Code hook semantics, so it is intentionally not wired into the Codex plugin metadata.
+- **Provider-specific SessionStart hook omitted**. The upstream `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` path depends on a hook runtime Codex does not expose through `.codex-plugin/plugin.json`, so it is intentionally not wired into the Codex plugin metadata.
 - **Phase 2.2 scope reduction** remains relevant: a `SubagentStop → run_codex_audit.sh` codex audit hook was scoped out for v3.7.0 because the hook payload lacks stage/deliverable information and same-session invocation would violate the wrapper boundary.
 - **`docs/PERFORMANCE.md` + `.zh-TW.md`** now describe model inheritance in Codex terms.
 - **What did NOT change**: the four skill directories, all 25 modes, agent prompts, schema files, and lint contracts.
@@ -394,7 +394,7 @@ v3.5.1 adds an opt-in honesty probe to the Socratic Mentor (`ARS_SOCRATIC_READIN
 ### v3.3.6 (2026-04-15) — README Streamlining + ARCHITECTURE doc
 
 - Added `docs/ARCHITECTURE.md` as the single source of truth for pipeline structure (flow, matrix, data-access, dependency graph, quality gates, modes). Merged into main via PR #18.
-- Added `docs/SETUP.md` (prerequisites, API keys, Pandoc/tectonic, cross-model verification, installation methods) and `docs/PERFORMANCE.md` (token budgets, recommended Claude Code settings). README links to both instead of inlining them.
+- Added `docs/SETUP.md` (prerequisites, API keys, Pandoc/tectonic, cross-model verification, installation methods) and `docs/PERFORMANCE.md` (token budgets, recommended Codex settings). README links to both instead of inlining them.
 - Streamlined README: removed the ASCII pipeline diagram and 16-point key-feature list (superseded by ARCHITECTURE.md); Skill Details section now anchors version numbers and points readers to ARCHITECTURE.md §3 for per-agent rosters.
 - Note: no functional change to any skill. Pure documentation reorganization. Suite version bumped to `3.3.6`.
 
@@ -423,7 +423,7 @@ v3.5.1 adds an opt-in honesty probe to the Socratic Mentor (`ARS_SOCRATIC_READIN
 
 ### v3.3.1 (2026-04-14) — Spec Consistency Patch
 
-- Synced README, `.claude/CLAUDE.md`, `MODE_REGISTRY.md`, and `SKILL.md` files to the current mode counts and published skill versions.
+- Synced README, `AGENTS.md`, `MODE_REGISTRY.md`, and `SKILL.md` files to the current mode counts and published skill versions.
 - Corrected cross-model wording: integrity sample checks and independent DA critique are implemented today; sixth-reviewer peer review remains planned.
 - Clarified adaptive checkpoint semantics so SLIM checkpoints still wait for explicit user confirmation.
 - Reaffirmed that Stage 2.5 and Stage 4.5 integrity gates cannot be skipped.
@@ -457,7 +457,7 @@ External contributions: [@mchesbro1](https://github.com/mchesbro1) originally pr
 
 ### v3.1 (2026-04-06) — Anti-Context-Rot + Cognitive Frameworks + Lean Size
 
-Inspired by patterns from [aspi6246/Claude-Code-Skills-for-Academics](https://github.com/aspi6246/Claude-Code-Skills-for-Academics).
+Inspired by patterns from a prior academic skills repository by aspi6246.
 
 **Wave 1: Anti-Context-Rot Anchors**
 - 29 explicit Anti-Patterns across all 4 skills (7-8 per skill, tabular format with "Why It Fails" + "Correct Behavior")

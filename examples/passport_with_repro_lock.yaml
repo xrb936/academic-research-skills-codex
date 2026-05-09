@@ -17,8 +17,8 @@ repro_lock:
   ars_version: "3.3.5"
 
   model:
-    family: claude
-    id: claude-opus-4-7
+    family: codex
+    id: gpt-5.5
     weight_stable: false
 
   prompts:

@@ -39,7 +39,7 @@ raise:
       - "Section 2.3: Two independent reviewers validated all AI-assisted title/abstract screening decisions."
       - "PROSPERO CRD42026999001: protocol pre-registered with explicit human-review checkpoints at each stage."
     transparency:
-      - "Appendix A: full prompt library disclosed; model version (claude-sonnet-4-6, 2026-02-01) logged."
+      - "Appendix A: full prompt library disclosed; model version (gpt-5.5, 2026-02-01) logged."
       - "Methods 3.1: AI tool names, versions, and date of use reported per PRISMA-trAIce T1 guidance."
     reproducibility:
       - "OSF repository osf.io/xyz99: search strings, inclusion/exclusion decisions, and extraction sheets archived."
@@ -51,7 +51,7 @@ raise:
     evidence_synthesists:
       - "Lead author conducted final arbitration on all AI-flagged conflicts (n = 34)."
     ai_development_teams:
-      - "Used published claude-sonnet-4-6 API; no custom fine-tuning; model card reviewed."
+      - "Used published gpt-5.5 API; no custom fine-tuning; model card reviewed."
     methodologists:
       - "Statistical reviewer confirmed meta-analytic model selection was made independently of AI outputs."
     publishers:

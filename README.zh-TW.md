@@ -51,7 +51,7 @@ v3.3 的靈感來自 [**PaperOrchestra**](https://arxiv.org/abs/2604.05018)（So
 - **Academic Paper** — 12 個 Agent 的論文撰寫團隊，含風格校準、寫作品質檢查、LaTeX 輸出強化、視覺化、修訂教練、引用格式轉換、反洩漏協議、VLM 圖表驗證。
 - **Academic Paper Reviewer** — 7 個 Agent 的多視角同儕審查，0-100 品質量表（主編 + 3 位動態審查者 + 魔鬼代言人），含讓步門檻協議、攻擊強度保持、可選跨模型 DA critique / calibration、R&R 追溯矩陣、唯讀約束。
 - **Academic Pipeline** — 10 階段全流程調度器，含自適應 checkpoint、宣稱驗證、素材護照、可選 `repro_lock`、可選跨模型誠信驗證、中途強化機制、分數軌跡追蹤。
-- **資料存取層級標註**（v3.3.2+）— 每個 skill 宣告 `data_access_level`（`raw` / `redacted` / `verified_only`），由 `scripts/check_data_access_level.py` 強制執行。設計靈感來自 Anthropic 的 automated-w2s-researcher（2026）。詳見 [`shared/ground_truth_isolation_pattern.md`](shared/ground_truth_isolation_pattern.md)。
+- **資料存取層級標註**（v3.3.2+）— 每個 skill 宣告 `data_access_level`（`raw` / `redacted` / `verified_only`），由 `scripts/check_data_access_level.py` 強制執行。設計靈感來自 automated-w2s-researcher 研究（2026）。詳見 [`shared/ground_truth_isolation_pattern.md`](shared/ground_truth_isolation_pattern.md)。
 - **任務類型標註**（v3.3.2+）— 每個 skill 宣告 `task_type`（`open-ended` 或 `outcome-gradable`）。目前 ARS 所有 skills 皆為 `open-ended`。
 - **Benchmark 報告 Schema**（v3.3.5+）— JSON Schema + lint script，要求誠實的 benchmark 比較報告。詳見 [`shared/benchmark_report_pattern.md`](shared/benchmark_report_pattern.md)。
 - **Artifact 可重現性 Lockfile**（v3.3.5+）— Material Passport 新增可選 `repro_lock` 子區塊。**是設定文件化，不是重播保證** — LLM 輸出不是位元可重現。詳見 [`shared/artifact_reproducibility_pattern.md`](shared/artifact_reproducibility_pattern.md)。
@@ -262,7 +262,7 @@ https://github.com/Imbad0202/academic-research-skills
 
 **吳政宜** (Cheng-I Wu) — 作者與維護者
 
-**[aspi6246](https://github.com/aspi6246)** — 貢獻者。v3.1 優化靈感來自 [Claude-Code-Skills-for-Academics](https://github.com/aspi6246/Claude-Code-Skills-for-Academics)：唯讀約束模式、Anti-Pattern 作為一等公民設計、認知框架方法（教「如何思考」而非只有步驟）、精簡 skill 尺寸哲學。
+**[aspi6246](https://github.com/aspi6246)** — 貢獻者。v3.1 優化靈感來自其早期 academic skills repository：唯讀約束模式、Anti-Pattern 作為一等公民設計、認知框架方法（教「如何思考」而非只有步驟）、精簡 skill 尺寸哲學。
 
 **[mchesbro1](https://github.com/mchesbro1)** — 貢獻者。最初提出並撰寫了 IS Basket of 8 期刊清單（[Issue #5](https://github.com/Imbad0202/academic-research-skills/issues/5)）。
 
@@ -274,12 +274,12 @@ https://github.com/Imbad0202/academic-research-skills
 
 ### v3.7.0（2026-05-05）— Codex Plugin Metadata 適配
 
-> 上游 v3.7.0 新增 Claude Code plugin 打包。本 fork 保留打包意圖，但把目前入口轉成 Codex：`.codex-plugin/plugin.json` 描述整套 suite；直接 `git clone` 後 symlink 或 copy 到 `~/.codex/skills/` 仍是最可攜流程。
+> 上游 v3.7.0 新增 provider-specific plugin 打包。本 fork 保留打包意圖，但把目前入口轉成 Codex：`.codex-plugin/plugin.json` 描述整套 suite；直接 `git clone` 後 symlink 或 copy 到 `~/.codex/skills/` 仍是最可攜流程。
 
-- **Codex plugin manifest**：`.codex-plugin/plugin.json` 供支援 plugin metadata 的 Codex 環境讀取，並指向既有四個 skill 目錄。本 fork 不恢復 Claude Code 的 `.claude-plugin/` marketplace 檔案。
-- **10 個 command prompt 檔** 位於 `commands/ars-*.md`，將 `MODE_REGISTRY.md` 條目對映到 `/ars-<mode>` 風格觸發。Frontmatter 改用 `model: inherit`，跟隨目前 Codex session，不再釘住上游 Claude package 的 Opus / Sonnet 名稱。
+- **Codex plugin manifest**：`.codex-plugin/plugin.json` 供支援 plugin metadata 的 Codex 環境讀取，並指向既有四個 skill 目錄。本 fork 不恢復上游 provider-specific marketplace 檔案。
+- **10 個 command prompt 檔** 位於 `commands/ars-*.md`，將 `MODE_REGISTRY.md` 條目對映到 `/ars-<mode>` 風格觸發。Frontmatter 改用 `model: inherit`，跟隨目前 Codex session，不再釘住上游 package 的 provider-specific model tier。
 - **3 個 plugin-adjacent agent pointer** 位於 `agents/*_agent.md`，仍以相對 symlink 指向 `deep-research/agents/` 內 v3.6.7 已 hardened 的下游 agent：`synthesis_agent`、`research_architect_agent`、`report_compiler_agent`。Symlink 維持 single source of truth，並保留既有 pattern-protection lint 路徑。
-- **Claude SessionStart hook 省略**：上游 `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` 依賴 `${CLAUDE_PLUGIN_ROOT}` 與 Claude Code hook 語義，因此不接入 Codex plugin metadata。
+- **Provider-specific SessionStart hook 省略**：上游 `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` 依賴 Codex 未透過 `.codex-plugin/plugin.json` 暴露的 hook runtime，因此不接入 Codex plugin metadata。
 - **Phase 2.2 範圍縮減** 仍保留：`SubagentStop → run_codex_audit.sh` codex audit hook 因 payload 缺 stage / deliverable 資訊，且同 session 呼叫會違反 wrapper 邊界，故未在 v3.7.0 接入。
 - **`docs/PERFORMANCE.md` + `.zh-TW.md`** 改以 Codex 語境說明 model inherit。
 - **沒動的東西**：4 個 skill 目錄、25 個 mode、agent prompt、schema 檔案、lint contract。
@@ -374,7 +374,7 @@ v3.5.1 新增 Socratic Mentor 的選用式誠實探測（設定 `ARS_SOCRATIC_RE
 ### v3.3.6 (2026-04-15) — README 精簡 + ARCHITECTURE 文件
 
 - 新增 `docs/ARCHITECTURE.md` 作為 pipeline 結構的單一來源（流程、矩陣、資料存取、依賴圖、品質閘門、模式）。透過 PR #18 合併入 main。
-- 新增 `docs/SETUP.md` / `docs/SETUP.zh-TW.md`（前置需求、API key、Pandoc/tectonic、跨模型驗證、四種安裝方式），以及 `docs/PERFORMANCE.md` / `docs/PERFORMANCE.zh-TW.md`（token 預算、建議 Claude Code 設定）。README 以連結取代內嵌。
+- 新增 `docs/SETUP.md` / `docs/SETUP.zh-TW.md`（前置需求、API key、Pandoc/tectonic、跨模型驗證、四種安裝方式），以及 `docs/PERFORMANCE.md` / `docs/PERFORMANCE.zh-TW.md`（token 預算、建議 Codex 設定）。README 以連結取代內嵌。
 - 精簡 README：移除 ASCII pipeline 圖與 16 項 key-feature 清單（已被 ARCHITECTURE.md 取代）；Skill 詳細資訊維持版本號錨點，讀者跳到 ARCHITECTURE.md §3 看各 agent 名單。
 - 註記：沒有任何 skill 的功能變動，純文件重構。suite version 升級至 `3.3.6`。
 
@@ -403,7 +403,7 @@ v3.5.1 新增 Socratic Mentor 的選用式誠實探測（設定 `ARS_SOCRATIC_RE
 
 ### v3.3.1 (2026-04-14) — 規格一致性修補
 
-- 同步 README、`.claude/CLAUDE.md`、`MODE_REGISTRY.md` 與各 `SKILL.md` 的 mode 數量與公開版本標示。
+- 同步 README、`AGENTS.md`、`MODE_REGISTRY.md` 與各 `SKILL.md` 的 mode 數量與公開版本標示。
 - 修正跨模型敘述：目前已實作的是誠信抽樣查核與獨立 DA critique；同儕審查第六位 reviewer 仍在規劃中。
 - 釐清 adaptive checkpoint 語意：SLIM checkpoint 仍然必須等待使用者明確確認。
 - 再次明確化 Stage 2.5 與 Stage 4.5 誠信關卡不可跳過。
@@ -437,7 +437,7 @@ v3.5.1 新增 Socratic Mentor 的選用式誠實探測（設定 `ARS_SOCRATIC_RE
 
 ### v3.1 (2026-04-06) — 抗 Context Rot + 認知框架 + 精簡尺寸
 
-靈感來自 [aspi6246/Claude-Code-Skills-for-Academics](https://github.com/aspi6246/Claude-Code-Skills-for-Academics)。
+靈感來自 aspi6246 的早期 academic skills repository。
 
 **Wave 1：抗 Context Rot 錨定**
 - 4 個 skill 共 29 條 Anti-Patterns（每個 7-8 條，表格含「為何失敗」+「正確行為」）

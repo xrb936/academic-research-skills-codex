@@ -3,7 +3,7 @@ description: ARS academic-paper `revision-coach` mode — Revision Roadmap + Res
 model: inherit
 ---
 
-Trigger the `academic-paper` skill in `revision-coach` mode. Parses reviewer comments and produces a Revision Roadmap plus a Response Letter skeleton, without writing the revision itself. Balanced spectrum, medium oversight. Uses opus per project policy for review-interpretation depth.
+Trigger the `academic-paper` skill in `revision-coach` mode. Parses reviewer comments and produces a Revision Roadmap plus a Response Letter skeleton, without writing the revision itself. Balanced spectrum, medium oversight. Uses the current Codex session model for review interpretation depth.
 
 Mode reference: `MODE_REGISTRY.md` § academic-paper.
 Skill entry: `academic-paper/SKILL.md`.

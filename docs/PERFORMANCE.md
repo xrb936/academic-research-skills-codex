@@ -37,7 +37,7 @@ The Codex-adapted distribution carries `.codex-plugin/plugin.json` plus three pl
 
 - A high-reasoning Codex session keeps those agent calls at the same reasoning posture.
 - A lower-cost Codex session keeps the command and agent surface aligned with that current session.
-- The fork does not pin Claude-specific Opus / Sonnet / Haiku names in command frontmatter.
+- The fork does not pin provider-specific model tiers in command frontmatter.
 
 This means **plugin-adjacent agent token costs track the per-mode estimates above unchanged**. If you change the main Codex session model or reasoning profile mid-pipeline, subsequent inherited calls follow that configuration.
 

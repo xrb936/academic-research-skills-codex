@@ -9,7 +9,7 @@ skill files? Which session materials?
 
 The `repro_lock` sub-block fills that gap.
 
-When the Anthropic automated-w2s-researcher paper (2026) claimed "2 researchers × 7 days
+When the automated-w2s-researcher paper (2026) claimed "2 researchers × 7 days
 vs 9 agents × 5 days," readers had no way to audit the conditions. This pattern ensures
 that ARS-produced artifacts carry their configuration on record — not as a replay mechanism,
 but as an honest documentation trail.

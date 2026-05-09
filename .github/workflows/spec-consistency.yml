@@ -66,6 +66,9 @@ jobs:
           PYTHONPATH: scripts
         run: python3 scripts/check_version_consistency.py
 
+      - name: Check Codex fork residue
+        run: python3 scripts/check_codex_residue.py --root .
+
       - name: Run version consistency unit tests
         env:
           PYTHONPATH: .

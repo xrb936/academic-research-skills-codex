@@ -13,10 +13,10 @@ A suite of Codex skills for rigorous academic research, paper writing, peer revi
 
 ## v3.7.0 Key Additions
 
-- **Codex plugin metadata**: this fork translates the upstream v3.7.0 plugin-packaging work into `.codex-plugin/plugin.json`, pointing plugin-aware Codex environments at the existing four skill directories without restoring the Claude Code `.claude-plugin/` entrypoint. Direct `git clone` + symlink or copy install under `~/.codex/skills/` remains the most portable path.
-- **10 command prompt files** (`commands/ars-*.md`) map `MODE_REGISTRY.md` entries to `/ars-<mode>` style triggers. Their frontmatter uses `model: inherit`, so they follow the current Codex session rather than pinning Claude-specific Opus / Sonnet names.
+- **Codex plugin metadata**: this fork translates the upstream v3.7.0 plugin-packaging work into `.codex-plugin/plugin.json`, pointing plugin-aware Codex environments at the existing four skill directories without restoring the provider-specific plugin entrypoint from upstream. Direct `git clone` + symlink or copy install under `~/.codex/skills/` remains the most portable path.
+- **10 command prompt files** (`commands/ars-*.md`) map `MODE_REGISTRY.md` entries to `/ars-<mode>` style triggers. Their frontmatter uses `model: inherit`, so they follow the current Codex session rather than pinning provider-specific model tiers.
 - **3 plugin-adjacent agent pointers** (`agents/*_agent.md`) remain relative symlinks to the v3.6.7-hardened downstream agents in `deep-research/agents/`. Source frontmatter uses `model: inherit`, preserving one source of truth while avoiding provider-specific model floors.
-- **Claude SessionStart hook omitted in the Codex fork**: the upstream `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` path depends on `${CLAUDE_PLUGIN_ROOT}` and Claude Code hook semantics, so it is not wired into `.codex-plugin/plugin.json`.
+- **Provider-specific SessionStart hook omitted in the Codex fork**: the upstream `hooks/hooks.json` + `scripts/announce-ars-loaded.sh` path depends on a hook runtime Codex does not expose through `.codex-plugin/plugin.json`, so it is not wired into this fork.
 - **Phase 2.2 scope reduction note retained**: a `SubagentStop → run_codex_audit.sh` codex audit hook was scoped out for v3.7.0 (contract gap: hook payload carries no stage/deliverable; invoker boundary: same-session in-LLM Bash forbidden by the wrapper). Deferred to a future release.
 
 ## v3.6.8 Key Additions

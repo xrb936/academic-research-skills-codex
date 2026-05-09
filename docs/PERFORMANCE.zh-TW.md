@@ -37,7 +37,7 @@ Codex 適配版帶有 `.codex-plugin/plugin.json` 與三個 plugin-adjacent agen
 
 - 高推理 Codex session 會讓這些 agent call 保持相同推理配置。
 - 低成本 Codex session 則讓 command 與 agent surface 跟目前 session 對齊。
-- 本 fork 不在 command frontmatter 釘住 Claude-specific 的 Opus / Sonnet / Haiku 名稱。
+- 本 fork 不在 command frontmatter 釘住 provider-specific model tier。
 
 意涵：**plugin-adjacent agent 的 token 成本仍跟著上表各模式估算走**。如果 pipeline 中途更換 Codex session 模型或 reasoning profile，後續 inherit call 會跟著目前設定走。
 

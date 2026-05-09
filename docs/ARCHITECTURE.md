@@ -314,7 +314,7 @@ timeline
            : .codex-plugin/plugin.json + existing skill directories
            : 10 command prompt files (commands/ars-*.md, model: inherit)
            : 3 plugin-adjacent agent pointers (agents/, symlink to v3.6.7-hardened source, model: inherit)
-           : Claude SessionStart hook omitted because it depends on Claude Code hook semantics
+           : Codex SessionStart hook omitted because it depends on Codex hook semantics
 ```
 
 ## 9. Skill Modes

@@ -6,7 +6,7 @@ Comprehensive ethics checklist for AI-assisted academic research. Used by the et
 ## 1. AI Disclosure
 
 ### Mandatory Disclosure Elements
-- [ ] AI tools used are named (e.g., "Codex," "ChatGPT," "Claude," "Gemini")
+- [ ] AI tools used are named (e.g., "Codex," "ChatGPT," "Codex," "Gemini")
 - [ ] Scope of AI involvement specified:
   - [ ] Literature search assistance
   - [ ] Source screening

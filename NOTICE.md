@@ -6,7 +6,7 @@ This project (academic-research-skills) is a personal project by Cheng-I Wu (Imb
 
 **Development context:**
 - Developed in personal time using personal equipment
-- Uses personal AI subscriptions (Claude / Codex / Gemini etc., self-paid)
+- Uses personal AI subscriptions (Codex / Gemini / other providers, self-paid)
 - Does not contain confidential information from any employer
 - Domain knowledge applied is publicly available or personally researched
 
