@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -50,7 +51,23 @@ def _legacy_terms() -> dict[str, re.Pattern[str]]:
 
 
 def _iter_files(root: Path):
-    for path in root.rglob("*"):
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "ls-files"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        for path in root.rglob("*"):
+            if any(part in SKIP_DIRS for part in path.parts):
+                continue
+            if path.is_file():
+                yield path
+        return
+
+    for rel in result.stdout.splitlines():
+        path = root / rel
         if any(part in SKIP_DIRS for part in path.parts):
             continue
         if path.is_file():
